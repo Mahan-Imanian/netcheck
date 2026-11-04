@@ -21,8 +21,6 @@ fastest one. Run it before you queue.
 
 <img src="docs/assets/demo.gif" alt="Netcheck running a check: the gauge fills, regions appear on the map, and the result shows" width="900">
 
-<sub>The release build on a live connection, at real speed.</sub>
-
 </div>
 
 ## What it does
