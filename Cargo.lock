@@ -2190,7 +2190,7 @@ dependencies = [
 
 [[package]]
 name = "netcheck"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "netcheck-core",
  "serde",
@@ -2206,7 +2206,7 @@ dependencies = [
 
 [[package]]
 name = "netcheck-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "reqwest 0.12.28",
  "rusqlite",
@@ -2951,11 +2951,11 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.13.5"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16a1cfa75cc186dd73d5818e510e042e40927bccc9c236b061cea97e1eb08029"
+checksum = "62e0021ea2c22aed41653bc7e1419abb2c97e038ff2c33d0e1309e49a97deec0"
 dependencies = [
- "base64 0.23.1",
+ "base64 0.22.1",
  "bytes",
  "futures-core",
  "futures-util",
@@ -3036,9 +3036,9 @@ dependencies = [
 
 [[package]]
 name = "rustversion"
-version = "1.0.23"
+version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
+checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
 
 [[package]]
 name = "ryu"
@@ -3658,7 +3658,7 @@ dependencies = [
  "percent-encoding",
  "plist",
  "raw-window-handle",
- "reqwest 0.13.5",
+ "reqwest 0.13.3",
  "serde",
  "serde_json",
  "serde_repr",

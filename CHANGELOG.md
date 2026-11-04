@@ -7,6 +7,14 @@ versions may change behavior and settings.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-04
+
+### Fixed
+
+- The map placed Datapacket Frankfurt, Vienna and London in the wrong part of
+  the world, because Valve's relay list has their latitude and longitude
+  swapped. They now use their sister city's coordinates.
+
 ## [0.2.0] - 2026-11-04
 
 ### Changed
@@ -50,6 +58,7 @@ The first public release.
 - Netcheck never needs administrator rights, never changes system settings, and
   never reads or touches game files.
 
-[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.0
 [0.1.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.1.0
