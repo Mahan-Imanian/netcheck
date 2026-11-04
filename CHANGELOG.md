@@ -29,11 +29,14 @@ The first public release.
   history heatmap with your best and worst hours.
 - Launch CS2 through Steam, with an option to close Netcheck afterwards.
 - Dark and light themes.
-- Per-user (NSIS) and per-machine (MSI) installers for Windows 10 and 11.
+- Per-user (NSIS) and per-machine (MSI) installers for 64-bit Windows.
 
 ### Notes
 
 - Installers are unsigned, so Windows SmartScreen may warn on first run.
+- Tested on Windows 11. Windows 10 is expected to work but hasn't been tested.
+- Launching CS2 from Netcheck, and the option to close Netcheck afterwards,
+  haven't been tested end to end yet.
 - Netcheck never needs administrator rights, never changes system settings, and
   never reads or touches game files.
 

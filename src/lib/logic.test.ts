@@ -100,15 +100,15 @@ describe("route explanation", () => {
       target: "155.133.0.10",
       estimated: false,
       noRoute: false,
-      hops: [hop(1, "192.168.1.1", 1, "Local"), hop(2, "10.20.0.1", 2, "Isp"), hop(3, "198.51.100.17", 69, "International"), hop(4, "85.132.90.233", 134, "International", 2), hop(5, "155.133.0.10", 140, "Valve", 2)],
+      hops: [hop(1, "192.168.1.1", 1, "Local"), hop(2, "10.20.0.1", 2, "Isp"), hop(3, "198.51.100.17", 69, "International"), hop(4, "203.0.113.233", 134, "International", 2), hop(5, "155.133.0.10", 140, "Valve", 2)],
       diagnosis: {
         reachedDestination: true,
-        finding: { segment: "International", ttl: 4, addr: "85.132.90.233", kind: "LatencyAndLoss", prevAvg: 69, avg: 134, lost: 2, sent: 6 },
+        finding: { segment: "International", ttl: 4, addr: "203.0.113.233", kind: "LatencyAndLoss", prevAvg: 69, avg: 134, lost: 2, sent: 6 },
       },
     };
     const e = explainRoute(route, { city: "Frankfurt", avg: 87 });
     expect(e.body).toBe(
-      "Your router and ISP are fine (1 ms, 2 ms). The jump happens at 85.132.90.233, your ISP's international link: 69 → 134 ms with 2/6 lost. This is usually peak-hour congestion and nothing on your PC can fix it.",
+      "Your router and ISP are fine (1 ms, 2 ms). The jump happens at 203.0.113.233, your ISP's international link: 69 → 134 ms with 2/6 lost. This is usually peak-hour congestion and nothing on your PC can fix it.",
     );
     expect(e.advice).toBe("Try again later, or play on Frankfurt (87 ms, clean).");
   });

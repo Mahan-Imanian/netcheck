@@ -14,7 +14,7 @@ international link, or Valve. Then it launches the game.
 [![CI](https://github.com/Mahan-Imanian/netcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Mahan-Imanian/netcheck/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mahan-Imanian/netcheck?include_prereleases&label=release&color=33d6a3)](https://github.com/Mahan-Imanian/netcheck/releases)
 [![License: MIT](https://img.shields.io/github/license/Mahan-Imanian/netcheck?color=ece8e1)](LICENSE)
-![Windows 10 and 11](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-1a1f25)
+![Windows 11](https://img.shields.io/badge/platform-Windows%2011-1a1f25)
 
 [**Download**](https://github.com/Mahan-Imanian/netcheck/releases/latest) ·
 [How it works](docs/how-it-works.md) ·
@@ -81,14 +81,59 @@ screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>
      rights needed. Most people want this one.
    - `Netcheck_<version>_x64_en-US.msi` installs for all users and asks for
      admin rights.
-2. Run it. Releases are currently unsigned, so Windows SmartScreen may show
-   "Windows protected your PC". Choose **More info**, then **Run anyway**.
-   `SHA256SUMS.txt` on the release page lets you check the download first.
-3. Open Netcheck from the Start menu before you play.
+2. Optionally, check that the download is intact. In PowerShell, in the folder
+   you downloaded to:
 
-Requirements: Windows 10 or 11, 64-bit, and Microsoft Edge WebView2, which
-Windows 11 includes. The installer adds WebView2 if it's missing. Netcheck has
-been tested on Windows 11.
+   ```powershell
+   Get-FileHash .\Netcheck_*_x64-setup.exe -Algorithm SHA256
+   ```
+
+   The hash should match the line for that file in `SHA256SUMS.txt` on the
+   release page.
+3. Run the installer, then open Netcheck from the Start menu before you play.
+
+Requirements: Windows 11, 64-bit, with Microsoft Edge WebView2 (built into
+Windows 11). Windows 10 should work, because the app and its WebView2 runtime
+both support it, but it hasn't been tested yet. If you try it, please
+[report how it went](https://github.com/Mahan-Imanian/netcheck/issues/new?template=bug_report.yml).
+
+### About the "Windows protected your PC" warning
+
+The installers aren't code-signed yet. Code signing needs a paid certificate
+that ties a file to a verified publisher, and this project doesn't have one
+yet. Because of that, Windows SmartScreen will probably show **"Windows
+protected your PC"** the first time you run the installer. To continue,
+choose **More info**, then **Run anyway**.
+
+What this means for you:
+
+- Windows can't confirm who published the file. Only download Netcheck from
+  this repository's [Releases page](https://github.com/Mahan-Imanian/netcheck/releases).
+  Copies elsewhere could be modified.
+- The installers are built by
+  [GitHub Actions](https://github.com/Mahan-Imanian/netcheck/actions/workflows/release.yml)
+  from the tagged source in this repository, not on someone's PC, and the
+  checksums are generated in the same run.
+- Antivirus software is sometimes more suspicious of unsigned programs. If
+  yours flags Netcheck, please
+  [open an issue](https://github.com/Mahan-Imanian/netcheck/issues) with the
+  detection name.
+- Once a signing certificate is in place, releases will be signed
+  automatically and the warning will go away.
+
+Netcheck itself never asks for administrator rights. The per-user installer
+doesn't need them either.
+
+### Known limitations
+
+- **Tested on Windows 11 only.** Windows 10 is expected to work, but hasn't been
+  tested.
+- **Launch CS2** opens `steam://rungameid/730`, the same link a desktop
+  shortcut uses, so Steam needs to be installed. Launching the game, and the
+  "close Netcheck after launching" option, haven't been tested end to end yet.
+- **Some VPNs and firewalls drop ICMP.** Regions then show "no reply", even
+  though the game itself may connect fine.
+- **IPv4 only**, matching the relay addresses Valve publishes.
 
 ## Using it
 
@@ -206,9 +251,10 @@ These are plans, not promises. Ideas and pull requests are welcome in
 [issues](https://github.com/Mahan-Imanian/netcheck/issues).
 
 - [ ] Signed installers, so SmartScreen stops warning
+- [ ] Tested Windows 10 support
 - [ ] Install with `winget` and Scoop
 - [ ] Other Steam Datagram Relay games that use the same relay list, such as Dota 2 and Deadlock
-- [ ] Translations, starting with Persian
+- [ ] Translations
 - [ ] A portable build that doesn't need installing
 
 ## Contributing
