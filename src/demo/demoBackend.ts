@@ -245,9 +245,9 @@ export function createDemoBackend(params: URLSearchParams): Backend {
   const updateMode = params.get("update");
   const update: UpdateInfo | null = updateMode
     ? {
-        version: "0.3.0",
-        current: "0.2.1",
-        notes: "## Added\n\n- Netcheck tells you when a new version is out and can install it for you.\n- A portable build that runs without installing.\n\n## Changed\n\n- Updated the windows, reqwest, rusqlite and ts-rs crates.",
+        version: "0.4.0",
+        current: __APP_VERSION__,
+        notes: "## Added\n\n- The new version's changelog appears here, one line per change.\n- Sections follow the changelog: Added, Changed, Fixed.\n\n## Fixed\n\n- This text comes from the demo backend, not a real release.",
         pageUrl: "https://github.com/Mahan-Imanian/netcheck/releases",
         publishedAt: new Date().toISOString(),
         installer:
