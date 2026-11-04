@@ -20,7 +20,7 @@ foreach ($s in $shots) {
   $file = Join-Path $out "$($s[0]).png"
   $tmp = Join-Path $env:TEMP "nc-shot-$($s[0]).png"
   $budget = if ($s[0] -eq "map-sweep") { 2500 } else { 12000 }
-  & $edge --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 "--window-size=$($s[2] + 25),$($s[3] + 95)" "--virtual-time-budget=$budget" "--screenshot=$tmp" "$Base/?$($s[1])" 2>$null | Out-Null
+  & $edge --headless=new "--user-data-dir=$env:TEMP\nc-edge-profile" --no-first-run --no-proxy-server --disable-gpu --hide-scrollbars --force-device-scale-factor=1 "--window-size=$($s[2] + 25),$($s[3] + 95)" "--virtual-time-budget=$budget" "--screenshot=$tmp" "$Base/?$($s[1])" 2>$null | Out-Null
   $img = [Drawing.Bitmap]::FromFile($tmp)
   $crop = $img.Clone([Drawing.Rectangle]::new(0, 0, $s[2], $s[3]), $img.PixelFormat)
   $img.Dispose()

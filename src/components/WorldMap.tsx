@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { memo, useEffect, useMemo, useState } from "react";
 import land from "../assets/land-dots.json";
 import type { RegionInfo } from "../bindings/RegionInfo";
@@ -127,7 +127,7 @@ function Marker({ tone, size }: { tone: Tone | "pending"; size: number }) {
   }
 }
 
-function Sweep({ home, progress, reduce }: { home: [number, number]; progress: number; reduce: boolean }) {
+function Sweep({ home, progress }: { home: [number, number]; progress: number }) {
   const R = 560;
   const slices = 18;
   const span = 46;
@@ -140,7 +140,7 @@ function Sweep({ home, progress, reduce }: { home: [number, number]; progress: n
   };
   return (
     <g transform={`translate(${home[0]} ${home[1]})`} pointerEvents="none">
-      {!reduce && (
+      {(
         <g mask="url(#sweep-mask)">
           {Array.from({ length: slices }, (_, i) => (
             <path key={i} d={wedge((-span * i) / slices, (-span * (i + 1)) / slices)} fill="var(--nc-accent)" fillOpacity={0.13 * (1 - i / slices) ** 2} />
@@ -174,7 +174,6 @@ interface Props {
 }
 
 export function WorldMap({ compact = false, selected, onSelect }: Props) {
-  const reduce = useReducedMotion() ?? false;
   const infos = useApp((s) => s.infos);
   const results = useApp((s) => s.results);
   const order = useApp((s) => s.order);
@@ -187,7 +186,7 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
   const checking = phase === "relays" || phase === "checking" || phase === "boot";
   const progress = order.length ? Object.keys(results).length / order.length : 0;
   const best = useMemo(() => bestRegion(Object.values(results), { excludeBlocked: true }), [results]);
-  const dot = compact ? 3.4 : 4;
+  const dot = compact ? 6 : 5;
 
   const placed = order
     .map((code) => ({ info: infos[code], result: results[code] }))
@@ -230,7 +229,7 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
             <Graticule />
             <LandDots />
           </g>
-          {checking && <Sweep home={home} progress={progress} reduce={reduce} />}
+          {checking && <Sweep home={home} progress={progress} />}
 
           <g fill="none">
             {placed.map(({ info, result }) => {
@@ -246,11 +245,11 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
                     d={d}
                     strokeWidth={strong ? 1.4 : 0.8}
                     strokeOpacity={strong ? 0.75 : 0.28}
-                    initial={reduce ? false : { pathLength: 0 }}
+                    initial={{ pathLength: 0 }}
                     animate={{ pathLength: 1 }}
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                   />
-                  {!reduce && strong && <path d={d} strokeWidth={1.6} strokeOpacity={0.9} className="arc-flow" />}
+                  {strong && <path d={d} strokeWidth={1.6} strokeOpacity={0.9} className="arc-flow" />}
                 </g>
               );
             })}
@@ -265,7 +264,6 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
             const [lon, lat] = info.lonLat ?? [0, 0];
             const tone: Tone | "pending" = !result ? "pending" : result.block.state === "blocked" ? "blocked" : resultTone(result);
             const isBest = best?.code === info.code && !checking;
-            const label = info.code === preferred || isBest || info.code === focus;
             return (
               <g
                 key={info.code}
@@ -276,7 +274,7 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
                 className={onSelect ? "cursor-pointer" : undefined}
               >
                 <circle r={11} fill="transparent" />
-                {isBest && !reduce && (
+                {isBest && (
                   <circle
                     r={dot * 2}
                     fill="none"
@@ -288,35 +286,43 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
                 {isBest && <circle r={dot * 3.2} fill="url(#home-glow)" />}
                 <motion.g
                   key={result ? "on" : "off"}
-                  initial={reduce || !result ? false : { scale: 2.4, opacity: 0 }}
+                  initial={!result ? false : { scale: 2.4, opacity: 0 }}
                   animate={{ scale: info.code === focus ? 1.35 : 1, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 420, damping: 24 }}
                   style={{ filter: result && tone !== "muted" ? `drop-shadow(0 0 4px ${TONES[tone as Tone].color})` : undefined }}
                 >
                   <Marker tone={tone} size={dot} />
                 </motion.g>
-                {label && (
-                  <text
-                    x={dot + 6}
-                    y={4}
-                    className="num"
-                    fontSize={compact ? 13 : 11.5}
-                    fontWeight={600}
-                    fill="var(--nc-text)"
-                    stroke="var(--nc-bg)"
-                    strokeWidth={3}
-                    paintOrder="stroke"
-                  >
-                    {info.code.toUpperCase()}
-                    {result?.stats?.avg != null && (
-                      <tspan fill="var(--nc-text-2)" fontWeight={500}>{` ${ms(result.stats.avg)}`}</tspan>
-                    )}
-                  </text>
-                )}
               </g>
             );
           })}
         </svg>
+
+        {placed.map(({ info, result }) => {
+          const isBest = best?.code === info.code && !checking;
+          if (!(info.code === preferred || isBest || info.code === focus) || !info.lonLat) return null;
+          const tone = result ? (result.block.state === "blocked" ? "blocked" : resultTone(result)) : null;
+          return (
+            <div
+              key={`chip-${info.code}`}
+              className="pointer-events-none absolute z-[5] -translate-y-1/2"
+              style={{ left: `calc(${(px(info.lonLat[0]) / W) * 100}% + ${dot + 8}px)`, top: `${(py(info.lonLat[1]) / H) * 100}%` }}
+            >
+              <span
+                className="chamfer-sm display inline-flex items-center gap-1.5 px-2 py-[2px] text-[14px] font-bold tracking-[0.06em] whitespace-nowrap"
+                style={{ background: "var(--nc-s3)", boxShadow: "inset 0 0 0 1px var(--nc-line-2)" }}
+              >
+                <span className="text-text">{info.code.toUpperCase()}</span>
+                {result?.stats?.avg != null && tone && (
+                  <span style={{ color: TONES[tone].color }}>
+                    {ms(result.stats.avg)}
+                    <span className="ml-0.5 text-[11px] text-text-3">MS</span>
+                  </span>
+                )}
+              </span>
+            </div>
+          );
+        })}
 
         <AnimatePresence>
           {focus && focusInfo && hover && (

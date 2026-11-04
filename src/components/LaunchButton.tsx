@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { Play } from "lucide-react";
+import { ChevronRight, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useApp } from "../lib/store";
 
@@ -42,7 +42,7 @@ export function LaunchButton({ disabled }: { disabled?: boolean }) {
   };
 
   const label =
-    stage === "launching" ? "Opening Steam…" : stage === "launched" ? (settings?.closeAfterLaunch ? "Starting CS2, closing Netcheck" : "CS2 is starting") : "Launch CS2";
+    stage === "launching" ? "Opening Steam" : stage === "launched" ? (settings?.closeAfterLaunch ? "Starting CS2" : "CS2 is starting") : "Launch CS2";
 
   return (
     <div className="relative">
@@ -50,21 +50,26 @@ export function LaunchButton({ disabled }: { disabled?: boolean }) {
         type="button"
         onClick={onPress}
         disabled={disabled || stage === "launching" || stage === "launched" || !settings}
-        whileHover={{ y: -1 }}
-        whileTap={{ scale: 0.975, y: 0 }}
-        transition={{ type: "spring", stiffness: 600, damping: 30 }}
-        className="group relative flex h-[52px] w-full items-center justify-center gap-2.5 overflow-hidden rounded-full text-[15px] font-semibold tracking-[-0.01em] text-accent-ink disabled:opacity-55 disabled:saturate-50"
-        style={{
-          background: "linear-gradient(100deg, var(--nc-accent) 0%, color-mix(in srgb, var(--nc-accent) 45%, var(--nc-accent-2)) 60%, var(--nc-accent-2) 100%)",
-          boxShadow:
-            "inset 0 1px 0 rgb(255 255 255 / 0.5), inset 0 -1px 0 rgb(0 0 0 / 0.15), 0 14px 36px -12px color-mix(in srgb, var(--nc-accent) calc(var(--nc-glow) * 110%), transparent), 0 6px 24px -10px color-mix(in srgb, var(--nc-accent-2) calc(var(--nc-glow) * 90%), transparent)",
-        }}
+        whileTap={{ y: 1 }}
+        transition={{ type: "spring", stiffness: 900, damping: 40 }}
+        className="chamfer group relative flex h-[54px] w-full items-stretch overflow-hidden bg-accent text-accent-ink transition-[background,filter] duration-150 hover:bg-accent-2 disabled:bg-s4 disabled:text-text-3"
       >
-        {!disabled && <span className="sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/35 to-transparent" aria-hidden />}
-        <span className="relative grid size-7 place-items-center rounded-full bg-black/15 transition-transform duration-300 group-hover:scale-110">
-          <Play size={13} strokeWidth={2.5} fill="currentColor" className="translate-x-px" aria-hidden />
+        <span className="flex w-[54px] shrink-0 items-center justify-center border-r border-black/15 group-disabled:border-line-2">
+          <Play size={15} strokeWidth={2.5} fill="currentColor" className="translate-x-px" aria-hidden />
         </span>
-        <span className="relative">{label}</span>
+        <span className="display flex flex-1 items-center pl-5 text-[20px] font-bold tracking-[0.12em] uppercase">{label}</span>
+        <span className="flex items-center gap-0.5 pr-5" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <ChevronRight
+              key={i}
+              size={17}
+              strokeWidth={3}
+              className="-ml-2.5 first:ml-0 group-disabled:opacity-30"
+              style={disabled ? undefined : { animation: `chevron-run 1.4s ${i * 0.14}s var(--ease-out-quint) infinite` }}
+            />
+          ))}
+        </span>
+        <span className="pointer-events-none absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 group-hover:[animation:scan_0.7s_var(--ease-out-quint)]" aria-hidden />
       </motion.button>
       {stage === "error" && <p className="mt-2 text-[12px] text-bad">Couldn't open Steam: {error}</p>}
 
@@ -78,7 +83,6 @@ export function LaunchButton({ disabled }: { disabled?: boolean }) {
             exit={{ opacity: 0, y: 4 }}
             transition={{ type: "spring", stiffness: 500, damping: 34 }}
             className="panel absolute inset-x-0 bottom-[calc(100%+10px)] z-20 p-3.5"
-            style={{ background: "var(--nc-s3)" }}
             onKeyDown={(e) => e.key === "Escape" && setStage("idle")}
           >
             <p className="text-[13px] font-semibold">Close Netcheck once CS2 starts?</p>
@@ -88,14 +92,14 @@ export function LaunchButton({ disabled }: { disabled?: boolean }) {
                 ref={closeBtn}
                 type="button"
                 onClick={() => void answer(true)}
-                className="h-8 flex-1 rounded-full bg-accent text-[12.5px] font-semibold text-accent-ink transition-[filter] duration-150 hover:brightness-110 active:brightness-95"
+                className="display h-9 flex-1 bg-accent text-[14px] font-semibold tracking-[0.08em] uppercase text-accent-ink transition-[filter] duration-150 hover:brightness-110 active:brightness-95"
               >
                 Close it
               </button>
               <button
                 type="button"
                 onClick={() => void answer(false)}
-                className="h-8 flex-1 rounded-full border border-line-2 text-[12.5px] font-medium text-text transition-colors duration-150 hover:bg-s4"
+                className="display h-9 flex-1 border border-line-2 text-[14px] font-semibold tracking-[0.08em] uppercase text-text transition-colors duration-150 hover:bg-s4"
               >
                 Keep it open
               </button>

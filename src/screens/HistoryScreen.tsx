@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { Clock3, Moon } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { HistoryCell } from "../bindings/HistoryCell";
@@ -22,7 +22,6 @@ function dayLabel(day: string): string {
 }
 
 export function HistoryScreen() {
-  const reduce = useReducedMotion();
   const cells = useApp((s) => s.history);
   const preferred = useApp((s) => s.preferred);
   const info = useApp((s) => s.infos[s.preferred]);
@@ -40,7 +39,7 @@ export function HistoryScreen() {
       <section className="panel flex min-h-0 flex-col p-5" aria-label="History heatmap">
         <div className="flex items-baseline gap-2.5">
           <Flag code={preferred} size={18} />
-          <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{city} by hour</h2>
+          <h2 className="hud-title">{city} by hour</h2>
           <span className="text-[12px] text-text-3">average ping, last 14 days</span>
           <span className="flex-1" />
           <span className="num text-[11.5px] text-text-3">{checks} checks</span>
@@ -66,14 +65,17 @@ export function HistoryScreen() {
                     onMouseEnter={() => setHover(c ?? null)}
                     onFocus={() => setHover(c ?? null)}
                     aria-label={c ? `${dayLabel(d)} ${hourLabel(h)}: ${ms(c.avgMs)} ms` : `${dayLabel(d)} ${hourLabel(h)}: no check`}
-                    initial={reduce ? false : { opacity: 0, scale: 0.6 }}
+                    initial={{ opacity: 0, scale: 0.6 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: reduce ? 0 : (row * 24 + h) * 0.0012, duration: 0.25 }}
-                    className={`min-h-0 rounded-[3px] ${c ? "hover:ring-1 hover:ring-text" : ""}`}
+                    transition={{ delay: (row * 24 + h) * 0.0012, duration: 0.25 }}
+                    className={`min-h-0 transition-[box-shadow,transform] duration-150 ${c ? "hover:z-10 hover:scale-110" : ""}`}
                     style={
                       color
-                        ? { background: color, opacity: 0.85, boxShadow: `0 0 8px -2px ${color}` }
-                        : { background: "repeating-linear-gradient(135deg, var(--nc-s3) 0 2px, transparent 2px 5px)" }
+                        ? {
+                            background: `linear-gradient(160deg, color-mix(in srgb, ${color} 85%, white), ${color})`,
+                            boxShadow: `inset 0 1px 0 rgb(255 255 255 / 0.25), 0 0 0 1px color-mix(in srgb, ${color} 40%, transparent)`,
+                          }
+                        : { background: "color-mix(in srgb, var(--nc-s3) 55%, transparent)" }
                     }
                   />
                 );
@@ -96,7 +98,7 @@ export function HistoryScreen() {
               {hover.samples} check{hover.samples === 1 ? "" : "s"}
             </span>
           ) : (
-            <span>Hover a cell for details. Hatched cells are hours with no check, because Netcheck only measures while it's open.</span>
+            <span>Hover a cell for details. Empty cells are hours with no check, because Netcheck only measures while it's open.</span>
           )}
         </div>
       </section>

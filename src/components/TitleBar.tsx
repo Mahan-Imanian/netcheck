@@ -21,17 +21,12 @@ function CheckStatus() {
   const checking = phase === "boot" || phase === "relays" || phase === "checking";
 
   return (
-    <div className="flex items-center gap-2 text-[12px] whitespace-nowrap text-text-2" aria-live="polite">
-      <span className="relative grid size-2 place-items-center">
-        <span
-          className={`size-2 rounded-full ${checking ? "live-dot bg-accent" : phase === "failed" ? "bg-bad" : "bg-good"}`}
-          style={{ boxShadow: checking ? "0 0 10px var(--nc-accent)" : undefined }}
-        />
-      </span>
+    <div className="display flex items-center gap-2 text-[13.5px] font-semibold tracking-[0.08em] whitespace-nowrap text-text-2 uppercase" aria-live="polite">
+      <span className={`size-[7px] ${checking ? "live-dot bg-accent" : phase === "failed" ? "bg-bad" : "bg-good"}`} />
       {phase === "checking" && total > 0 ? (
         <span>
-          <span className="num text-text">{String(done).padStart(String(total).length, "0")}</span>
-          <span className="num text-text-3"> / {total}</span>
+          <span className="text-text">{String(done).padStart(String(total).length, "0")}</span>
+          <span className="text-text-3"> / {total}</span>
           <span className="max-[1280px]:hidden"> regions</span>
         </span>
       ) : checking ? (
@@ -39,7 +34,7 @@ function CheckStatus() {
       ) : finishedAt ? (
         <span>
           <span className="max-[1280px]:hidden">Checked </span>
-          <span className="num text-text">{clock(finishedAt)}</span>
+          <span className="text-text">{clock(finishedAt)}</span>
         </span>
       ) : (
         <span>Check stopped</span>
@@ -81,70 +76,52 @@ export function TitleBar() {
   }, [backend]);
 
   return (
-    <header data-tauri-drag-region className="relative z-30 grid h-12 shrink-0 grid-cols-[1fr_auto_1fr] items-center pl-4">
-      <div data-tauri-drag-region className="flex items-center gap-2.5">
-        <Logo size={20} />
-        <span data-tauri-drag-region className="text-[14px] font-semibold tracking-[-0.02em]">
+    <header data-tauri-drag-region className="relative z-30 flex h-12 shrink-0 items-stretch border-b border-line pl-4">
+      <div data-tauri-drag-region className="flex items-center gap-2.5 pr-6">
+        <Logo size={22} />
+        <span data-tauri-drag-region className="display text-[19px] leading-none font-bold tracking-[0.14em] uppercase">
           Netcheck
         </span>
       </div>
 
-      <nav
-        className="flex h-8 items-center gap-0.5 rounded-full p-[3px]"
-        style={{ background: "var(--nc-glass)", boxShadow: "inset 0 0 0 1px var(--nc-line-2), inset 0 1px 0 var(--nc-hi)" }}
-        aria-label="Screens"
-      >
+      <nav className="flex items-stretch border-l border-line pl-2" aria-label="Screens">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
             aria-current={tab === t.id ? "page" : undefined}
-            className={`relative h-full rounded-full px-3.5 text-[12.5px] font-medium transition-colors duration-200 ${tab === t.id ? "text-text" : "text-text-3 hover:text-text-2"}`}
+            className={`display relative px-3.5 text-[14.5px] font-semibold tracking-[0.1em] uppercase transition-colors duration-150 ${tab === t.id ? "text-text" : "text-text-3 hover:text-text-2"}`}
           >
+            {t.label}
             {tab === t.id && (
-              <motion.span
-                layoutId="tab-pill"
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: "linear-gradient(180deg, var(--nc-s4), var(--nc-s3))",
-                  boxShadow: "inset 0 1px 0 var(--nc-hi), inset 0 0 0 1px var(--nc-line-2), 0 4px 14px -6px color-mix(in srgb, var(--nc-accent) 50%, transparent)",
-                }}
-                transition={{ type: "spring", stiffness: 480, damping: 38 }}
-              />
+              <motion.span layoutId="tab-bar" className="absolute inset-x-3.5 -bottom-px h-[2px] bg-accent" transition={{ type: "spring", stiffness: 520, damping: 42 }} />
             )}
-            <span className="relative">{t.label}</span>
           </button>
         ))}
       </nav>
 
+      <div data-tauri-drag-region className="flex-1" />
+
       <div data-tauri-drag-region className="flex h-full items-center justify-end">
         <div className="flex items-center gap-2.5 pr-2">
           <CheckStatus />
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.96 }}
-            onClick={() => void startCheck()}
-            disabled={checking}
-            title="Re-check (R)"
-            className="btn-ghost group whitespace-nowrap"
-          >
-            <RotateCw size={13} strokeWidth={2.25} className={`transition-transform duration-300 group-hover:rotate-90 ${checking ? "animate-spin [animation-duration:1.4s]" : ""}`} aria-hidden />
+          <button type="button" onClick={() => void startCheck()} disabled={checking} title="Re-check (R)" className="btn-ghost group whitespace-nowrap">
+            <RotateCw size={13} strokeWidth={2.5} className={`transition-transform duration-300 group-hover:rotate-90 ${checking ? "animate-spin [animation-duration:1.4s]" : ""}`} aria-hidden />
             <span className="max-[1100px]:hidden">Re-check</span>
-            <kbd className="num rounded-[5px] px-1 text-[10px] text-text-3 shadow-[inset_0_0_0_1px_var(--nc-line-2)]">R</kbd>
-          </motion.button>
+            <kbd className="num px-1 text-[10px] text-text-3 shadow-[inset_0_0_0_1px_var(--nc-line-2)]">R</kbd>
+          </button>
           <button
             type="button"
             onClick={() => setTab("settings")}
             aria-label="Settings"
             aria-current={tab === "settings" ? "page" : undefined}
             title="Settings"
-            className={`grid size-[30px] place-items-center rounded-full transition-colors duration-150 hover:bg-s4 ${tab === "settings" ? "bg-s4 text-accent" : "text-text-2"}`}
+            className={`grid size-[30px] place-items-center shadow-[inset_0_0_0_1px_var(--nc-line-2)] transition-colors duration-150 hover:bg-s4 ${tab === "settings" ? "bg-s4 text-text" : "bg-s3 text-text-2"}`}
           >
             <Settings2 size={15} strokeWidth={2} />
           </button>
-        </div>
-        <div className="flex h-full items-stretch">
+        </div>        <div className="flex h-full items-stretch">
         <WindowButton label="Minimize" onClick={() => void backend?.window.minimize()}>
           <Minus size={15} strokeWidth={1.5} />
         </WindowButton>

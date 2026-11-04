@@ -1,10 +1,9 @@
-import { animate, useReducedMotion } from "motion/react";
+import { animate } from "motion/react";
 import { useEffect, useRef } from "react";
 
 export function CountUp({ value, digits = 0, duration = 0.45 }: { value: number | null | undefined; digits?: number; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const shown = useRef<number | null>(null);
-  const reduce = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
@@ -18,7 +17,7 @@ export function CountUp({ value, digits = 0, duration = 0.45 }: { value: number 
       return;
     }
     const start = shown.current ?? 0;
-    if (reduce || start === value) {
+    if (start === value) {
       write(value);
       shown.current = value;
       return;
@@ -32,7 +31,7 @@ export function CountUp({ value, digits = 0, duration = 0.45 }: { value: number 
       },
     });
     return () => controls.stop();
-  }, [value, digits, duration, reduce]);
+  }, [value, digits, duration]);
 
   return <span ref={ref} aria-label={value == null ? "no value" : value.toFixed(digits)} />;
 }

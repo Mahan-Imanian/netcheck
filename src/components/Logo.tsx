@@ -1,15 +1,17 @@
+const BARS = [
+  { x: 6.5, h: 6 },
+  { x: 11.75, h: 10 },
+  { x: 17, h: 14 },
+  { x: 22.25, h: 18 },
+];
+
 export function Logo({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
-      <defs>
-        <linearGradient id="nc-logo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--nc-accent)" />
-          <stop offset="1" stopColor="var(--nc-accent-2)" />
-        </linearGradient>
-      </defs>
-      <circle cx="16" cy="16" r="13" fill="none" stroke="url(#nc-logo)" strokeOpacity="0.35" strokeWidth="2" />
-      <path d="M16 16 L16 3 A13 13 0 0 1 28.4 12.1 Z" fill="url(#nc-logo)" opacity="0.9" />
-      <circle cx="16" cy="16" r="3.2" fill="var(--nc-accent)" />
+      <path d="M7 0H32V25L25 32H0V7Z" fill="var(--nc-text)" />
+      {BARS.map((b, i) => (
+        <rect key={b.x} x={b.x} y={25.5 - b.h} width={3.6} height={b.h} fill={i === BARS.length - 1 ? "var(--nc-excellent)" : "var(--nc-bg)"} />
+      ))}
     </svg>
   );
 }

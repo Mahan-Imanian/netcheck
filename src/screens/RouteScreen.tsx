@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { Info, TriangleAlert, CheckCircle2 } from "lucide-react";
 import { useMemo } from "react";
 import type { Segment } from "../bindings/Segment";
@@ -13,7 +13,6 @@ import { useApp } from "../lib/store";
 const SEG_ORDER: Segment[] = ["Local", "Isp", "International", "Valve"];
 
 export function RouteScreen() {
-  const reduce = useReducedMotion();
   const route = useApp((s) => s.route);
   const info = useApp((s) => s.infos[s.preferred]);
   const infos = useApp((s) => s.infos);
@@ -53,14 +52,14 @@ export function RouteScreen() {
         </div>
         {text ? (
           <motion.div
-            initial={reduce ? false : { opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             className="relative flex gap-3 border-t border-line px-5 py-4"
             style={{ background: finding ? "linear-gradient(90deg, color-mix(in srgb, var(--nc-bad) 9%, transparent), transparent 70%)" : undefined }}
           >
             <Icon size={18} className="mt-0.5 shrink-0" style={{ color: tone }} />
             <div className="max-w-[820px]">
-              <div className="text-[14px] font-semibold" style={{ color: tone }}>
+              <div className="hud-title" style={{ color: tone }}>
                 {text.title}
               </div>
               <p className="mt-1 text-[13.5px] text-pretty text-text">{text.body}</p>
