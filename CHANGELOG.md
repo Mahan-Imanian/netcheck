@@ -7,6 +7,30 @@ versions may change behavior and settings.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-04
+
+### Added
+
+- When a newer release is out, Netcheck shows its version and notes after the
+  first check. Update now downloads the installer, checks it against the
+  SHA-256 that GitHub publishes, runs it and reopens Netcheck. The portable
+  build opens the release page instead. Turn the check off in Settings under
+  Updates.
+- A portable build, `Netcheck_<version>_x64-portable.exe`, that runs without
+  installing.
+
+### Changed
+
+- Updated the windows and windows-core crates to 0.62, reqwest to 0.13,
+  rusqlite to 0.41 and ts-rs to 12.
+
+### Not tested yet
+
+- Update now, end to end. 0.3.0 is the first version with it, so the first
+  real test is the update to the next release.
+- The portable build, Windows 10, and launching CS2 with "close Netcheck after
+  launching". See [docs/manual-testing.md](docs/manual-testing.md).
+
 ## [0.2.1] - 2026-11-04
 
 ### Fixed
@@ -58,7 +82,8 @@ The first public release.
 - Netcheck never needs administrator rights, never changes system settings, and
   never reads or touches game files.
 
-[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.3.0
 [0.2.1]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.0
 [0.1.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.1.0
