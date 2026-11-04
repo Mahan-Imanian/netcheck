@@ -81,6 +81,10 @@ cargo test -p netcheck-core
 cargo clippy --workspace --all-targets -- -D warnings -W clippy::unwrap_used
 ```
 
+Some things only a person on Windows can check, such as launching CS2,
+Windows 10 and the update flow. [`docs/manual-testing.md`](docs/manual-testing.md)
+lists the steps.
+
 `cargo test` also regenerates the TypeScript types in `src/bindings/` from the
 Rust structs. Commit them if they change, because CI fails when they're out of
 date.
