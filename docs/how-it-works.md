@@ -124,8 +124,8 @@ wolf:
 - **Distance isn't congestion.** Each hop's lowest average in the last 30 days
   is its "normal", and the rise it normally adds is subtracted. Until that
   history exists, a perfectly stable rise on the international segment counts
-  as long-haul propagation, not a problem. Tehran to Europe, for example, adds
-  about 65 ms of plain distance every night.
+  as long-haul propagation, not a problem. A long international route can add
+  60 ms or more of plain distance, every night, without anything being wrong.
 
 1.1.1.1 is measured as an "is the whole internet slow?" baseline. If 1.1.1.1 is
 bad and most regions are degraded, the verdict blames your ISP, not any one

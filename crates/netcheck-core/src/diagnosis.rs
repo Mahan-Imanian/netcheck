@@ -251,7 +251,7 @@ mod tests {
             hop(2, "10.20.0.1", steady(2.0), false),
             hop(3, "78.38.0.1", steady(4.0), false),
             hop(4, "78.38.240.17", steady(69.0), false),
-            hop(5, "85.132.90.233", noisy(134.0, 2), false),
+            hop(5, "203.0.113.233", noisy(134.0, 2), false),
             hop(6, "80.81.192.10", noisy(137.0, 2), false),
             hop(7, "155.133.0.10", noisy(141.0, 2), true),
         ])
@@ -262,7 +262,7 @@ mod tests {
         let r = brief_route();
         let f = run(&r).expect("finding");
         assert_eq!(f.segment, Segment::International);
-        assert_eq!(f.addr.as_deref(), Some("85.132.90.233"));
+        assert_eq!(f.addr.as_deref(), Some("203.0.113.233"));
         assert_eq!((f.prev_avg, f.lost, f.sent), (69.0, 2, 6));
         assert_eq!(f.kind, ProblemKind::LatencyAndLoss);
     }
@@ -275,7 +275,7 @@ mod tests {
             ("10.20.0.1", 2.0),
             ("78.38.0.1", 4.0),
             ("78.38.240.17", 68.0),
-            ("85.132.90.233", 72.0),
+            ("203.0.113.233", 72.0),
             ("80.81.192.10", 76.0),
             ("155.133.0.10", 82.0),
         ]
@@ -284,7 +284,7 @@ mod tests {
         .collect();
         attach_normals(&mut r, &normals);
         let f = run(&r).expect("finding");
-        assert_eq!(f.addr.as_deref(), Some("85.132.90.233"));
+        assert_eq!(f.addr.as_deref(), Some("203.0.113.233"));
         assert_eq!(f.segment, Segment::International);
     }
 
@@ -358,7 +358,7 @@ mod tests {
             hop(2, "10.0.0.1", steady(2.0), false),
             hop(3, "10.0.0.2", steady(3.0), false),
             hop(4, "100.70.0.1", steady(4.0), false),
-            hop(5, "85.132.90.233", steady(70.0), false),
+            hop(5, "203.0.113.233", steady(70.0), false),
             hop(6, "10.9.9.9", steady(71.0), false),
             hop(7, "155.133.0.10", steady(80.0), true),
         ]);
