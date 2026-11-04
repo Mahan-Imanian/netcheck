@@ -7,6 +7,15 @@ versions may change behavior and settings.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-04
+
+### Changed
+
+- Windows now lists Mahan Imanian as the publisher in Installed apps and the
+  installer, instead of "Netcheck".
+- The README shows the update dialog and the Settings screen, and the FAQ
+  explains how updates work.
+
 ## [0.3.0] - 2026-11-04
 
 ### Added
@@ -82,7 +91,8 @@ The first public release.
 - Netcheck never needs administrator rights, never changes system settings, and
   never reads or touches game files.
 
-[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.3.1
 [0.3.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.3.0
 [0.2.1]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.1
 [0.2.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.0
