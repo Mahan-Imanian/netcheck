@@ -1,21 +1,192 @@
-# Netcheck
+<div align="center">
 
-A pre-match connection check for Counter-Strike 2 on Windows. Open it before
-you queue. Within a few seconds it shows your ping, jitter and packet loss to
-every Valve relay region, where on the route any problem starts, and a
-**Launch CS2** button.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/wordmark-dark.png">
+  <img alt="Netcheck" src="docs/assets/wordmark-light.png" width="380">
+</picture>
 
-Netcheck runs only while its window is open. It has no tray icon, service,
-autostart, updater or game watcher. Closing the window cancels every probe in
-flight, flushes the history database and ends the process.
+### Know your Counter-Strike 2 connection before you queue.
 
-## Build
+Netcheck pings every Valve server region, measures jitter and packet loss, and
+traces your route to show whether a bad night is your Wi-Fi, your ISP, the
+international link, or Valve. Then it launches the game.
 
-Requirements: Rust (stable), Node 22+, pnpm 9+ and WebView2. On Windows either
-the MSVC toolchain or the GNU toolchain (`x86_64-pc-windows-gnu` plus a MinGW-w64
-GCC on `PATH`) works. With GNU, keep the Rust and MinGW installs in a path
-without spaces, because `ld` can't handle spaces. The MSI also needs WiX, which
-the Tauri CLI fetches.
+[![CI](https://github.com/Mahan-Imanian/netcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Mahan-Imanian/netcheck/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/Mahan-Imanian/netcheck?include_prereleases&label=release&color=33d6a3)](https://github.com/Mahan-Imanian/netcheck/releases)
+[![License: MIT](https://img.shields.io/github/license/Mahan-Imanian/netcheck?color=ece8e1)](LICENSE)
+![Windows 10 and 11](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-1a1f25)
+
+[**Download**](https://github.com/Mahan-Imanian/netcheck/releases/latest) ·
+[How it works](docs/how-it-works.md) ·
+[Contributing](CONTRIBUTING.md) ·
+[Changelog](CHANGELOG.md)
+
+<img src="docs/assets/demo.gif" alt="Netcheck running a check on a live connection: the gauge fills, regions arrive on the map, and the verdict appears" width="900">
+
+<sub>Recorded from the release build on a live connection, at real speed.</sub>
+
+</div>
+
+## Why Netcheck
+
+Your ping to a CS2 region isn't fixed. It changes with the time of day, your
+ISP's international links, and Wi-Fi interference. You usually find out
+mid-match, from rubber-banding and lost duels.
+
+Region pickers like Steam Route Tool block servers. Netcheck answers the
+question before that: **how is my connection right now, and whose fault is
+it?** It doesn't change anything on your PC. It measures, explains, and gets
+out of the way.
+
+## Features
+
+- **Every Valve region in about 10 seconds.** Netcheck pings every region,
+  using the relay list straight from Valve's API, and reports average,
+  worst-5%, jitter and packet loss for each.
+- **A verdict you can act on.** "Vienna is unstable right now. Frankfurt is
+  5 ms behind and clean." Grades from Excellent to Bad use thresholds you can
+  change.
+- **Finds the broken hop.** A parallel traceroute groups hops into router, ISP,
+  international link and Valve, and names the first one where latency or loss
+  really breaks. It learns each hop's normal latency, so plain distance isn't
+  mistaken for congestion.
+- **Understands your firewall.** If you block regions with Windows Firewall
+  rules, Netcheck labels those regions as blocked instead of dead, estimates
+  their ping, and warns when a rule does nothing because the firewall is off.
+- **History.** A 14-day, hour-by-hour heatmap shows when your preferred region
+  is reliably good, plus your best and worst hours.
+- **One click to play.** Launch CS2 through Steam, and optionally close
+  Netcheck on the way out.
+- **Light on your system.** It only runs while its window is open: no tray
+  icon, service, autostart or updater. It never needs admin rights and never
+  touches the game.
+
+## Screenshots
+
+| Route diagnosis | Every region |
+|---|---|
+| ![The route screen pinpointing a congested international link](docs/screenshots/route.png) | ![The regions table sorted by average ping](docs/screenshots/regions.png) |
+| **History** | **Light theme** |
+| ![The history heatmap of ping by hour](docs/screenshots/history.png) | ![The verdict screen in the light theme](docs/screenshots/light.png) |
+
+<sub>The animation above is the real app on a live connection. These four come
+from the built-in demo backend, which replays synthetic results and marks every
+screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>
+
+## Install
+
+1. Download the latest installer from
+   [**Releases**](https://github.com/Mahan-Imanian/netcheck/releases/latest):
+   - `Netcheck_<version>_x64-setup.exe` installs for your user, with no admin
+     rights needed. Most people want this one.
+   - `Netcheck_<version>_x64_en-US.msi` installs for all users and asks for
+     admin rights.
+2. Run it. Releases are currently unsigned, so Windows SmartScreen may show
+   "Windows protected your PC". Choose **More info**, then **Run anyway**.
+   `SHA256SUMS.txt` on the release page lets you check the download first.
+3. Open Netcheck from the Start menu before you play.
+
+Requirements: Windows 10 or 11, 64-bit, and Microsoft Edge WebView2, which
+Windows 11 includes. The installer adds WebView2 if it's missing. Netcheck has
+been tested on Windows 11.
+
+## Using it
+
+1. **Open Netcheck.** The check starts on its own and takes about 10 seconds.
+2. **Read the verdict.** The big number is your preferred region (Vienna by
+   default; change it in Settings). The line under the gauge says whether it's
+   good to play, and suggests a cleaner region if one exists.
+3. **If it's bad, open Route.** It shows which section of the path is at fault.
+   Your router or Wi-Fi is something you can fix. Congestion on the
+   international link usually clears up off-peak.
+4. **Press Launch CS2.**
+
+Press <kbd>R</kbd> at any time to check again. **History** shows your best and
+worst hours once you've run a few checks.
+
+### Settings
+
+| Setting | What it does |
+|---|---|
+| Your region | The region the gauge, route trace and history follow. |
+| Pings per region | 10 to 100, sent 100 ms apart. More pings give steadier numbers and take longer. |
+| Grade thresholds | Average, jitter and loss limits for each grade. Defaults live in [`config/thresholds.json`](config/thresholds.json). |
+| After launching CS2 | Close Netcheck, keep it open, or ask each time. |
+| Theme | System, dark or light. |
+| Map origin | Where the map's arcs start. Auto uses the location of your lowest-ping region. Custom lets you set it. |
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Valve relay list<br/>GetSDRConfig] --> B[Ping every region<br/>20 echoes each]
+    B --> C[Grade<br/>avg, jitter, loss]
+    D[Traceroute to<br/>your region] --> E[Find the first hop<br/>that really breaks]
+    F[Windows Firewall<br/>read-only] --> C
+    C --> G((Verdict))
+    E --> G
+```
+
+Netcheck sends ICMP echoes through the Windows `IcmpSendEcho2` API, the same
+path `ping.exe` uses. On Windows 11 its averages landed within 3 ms of
+`ping -n 20` against the same live Valve relays. The diagnosis only blames a
+hop when your region is actually degraded, ignores routers that are just slow
+to answer pings themselves, and subtracts each hop's normal latency.
+
+**Network use:** Valve's public relay list, ICMP echoes to relays, your router,
+1.1.1.1 and the hops on your route, and nothing else. No telemetry, no
+accounts, no update checks.
+
+The full details, with the exact rules, files on disk and architecture, are in
+[**docs/how-it-works.md**](docs/how-it-works.md).
+
+## FAQ
+
+<details>
+<summary><b>Can this get me VAC banned?</b></summary>
+
+Netcheck doesn't read, inject into or modify CS2, Steam or any game file, and
+it doesn't run while you play unless you leave it open. It pings Valve's
+public relay servers the same way `ping.exe` does, and launches the game
+through a `steam://` link. Netcheck isn't affiliated with or endorsed by Valve.
+</details>
+
+<details>
+<summary><b>Does it block or pick servers for me?</b></summary>
+
+No. Netcheck only measures. If you already block regions with Windows Firewall,
+Netcheck reads those rules and labels the blocked regions. It never changes
+firewall rules, routes or system settings.
+</details>
+
+<details>
+<summary><b>Why does it say a hop is fine when it shows a big number?</b></summary>
+
+Long-distance links add latency through plain physics. Netcheck learns each
+hop's normal latency from your history and only calls out rises above that, and
+only when your region is actually degraded.
+</details>
+
+<details>
+<summary><b>Does it work with a VPN?</b></summary>
+
+Netcheck measures the path your traffic actually takes. With a VPN on, that's
+the path through the VPN, which is useful for comparing the two. Some VPNs drop
+ICMP, and then regions show no reply.
+</details>
+
+## Build from source
+
+You need Rust (stable), Node.js 22+, pnpm 10 and a Windows C toolchain. See
+[CONTRIBUTING.md](CONTRIBUTING.md#development-setup) for details.
+
+```bash
+git clone https://github.com/Mahan-Imanian/netcheck.git
+```
+
+```bash
+cd netcheck
+```
 
 ```bash
 pnpm install
@@ -25,200 +196,47 @@ pnpm install
 pnpm tauri dev
 ```
 
-```bash
-pnpm tauri build
-```
+`pnpm tauri build` produces both installers in `target/release/bundle/`. To
+work on the UI on any OS, run `pnpm dev:demo` and open
+<http://localhost:1420/?scenario=unstable>.
 
-`pnpm tauri build` produces `target/release/bundle/msi/*.msi` and
-`target/release/bundle/nsis/*-setup.exe`. The NSIS installer is per-user, so it
-installs without admin rights. The MSI is per-machine and Windows asks for
-elevation to install it. The app itself never elevates: its manifest says
-`asInvoker`.
+## Roadmap
 
-Signing: `.github/workflows/release.yml` imports a PFX from the
-`WINDOWS_CERTIFICATE` / `WINDOWS_CERTIFICATE_PASSWORD` secrets and passes its
-thumbprint to the Tauri bundler. Without those secrets the installers are built
-unsigned.
+These are plans, not promises. Ideas and pull requests are welcome in
+[issues](https://github.com/Mahan-Imanian/netcheck/issues).
 
-### Tests
+- [ ] Signed installers, so SmartScreen stops warning
+- [ ] Install with `winget` and Scoop
+- [ ] Other Steam Datagram Relay games that use the same relay list, such as Dota 2 and Deadlock
+- [ ] Translations, starting with Persian
+- [ ] A portable build that doesn't need installing
 
-```bash
-cargo test -p netcheck-core
-```
+## Contributing
 
-```bash
-pnpm test
-```
+Bug reports from real networks are the most useful contribution, because every
+ISP behaves differently. Read [CONTRIBUTING.md](CONTRIBUTING.md) to set up the
+project, run the checks and open a pull request. Everyone taking part follows
+the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-```bash
-pnpm typecheck
-```
+## Security
 
-The Rust tests cover stats (jitter, p95, grading), problem-hop detection with a
-fixture route for each of the four cases, blocked-region detection, the relay
-list cache, the history store and the check engine (with a scripted prober).
-`crates/netcheck-core/tests/icmp_loopback.rs` pings 127.0.0.1 through the real
-`IcmpSendEcho2` path. It only compiles on Windows and runs in CI on
-`windows-latest`.
+Please report vulnerabilities privately through
+[GitHub security advisories](https://github.com/Mahan-Imanian/netcheck/security/advisories/new),
+not as public issues. See [SECURITY.md](SECURITY.md).
 
-`cargo test` also regenerates the TypeScript types in `src/bindings/` from the
-Rust structs (ts-rs), so the frontend and backend can't drift apart.
+## License and acknowledgements
 
-### Demo mode (development only)
+Netcheck is released under the [MIT License](LICENSE).
 
-```bash
-pnpm dev:demo
-```
+It's built with [Tauri](https://tauri.app), [React](https://react.dev),
+[Motion](https://motion.dev) and [Tailwind CSS](https://tailwindcss.com). The
+world map is drawn from [Natural Earth](https://www.naturalearthdata.com) data
+via [world-atlas](https://github.com/topojson/world-atlas). Flags come from
+[country-flag-icons](https://www.npmjs.com/package/country-flag-icons) and
+icons from [Lucide](https://lucide.dev). Type is set in
+[Geist](https://vercel.com/font) and
+[Barlow Condensed](https://github.com/jpt/barlow). Relay data comes from Valve's
+public Steam Web API.
 
-Then open `http://127.0.0.1:1420/?scenario=unstable`. Scenarios: `normal`,
-`unstable`, `congested`, `wifi`, `offline`, `blocked`, `allblocked`,
-`firewalloff`, `cache`, `norelays`, `longroute`. Add `&theme=light` or
-`&speed=0.5` as needed.
-
-Demo data is synthetic, uses only RFC 5737 documentation IPs, and shows a
-**DEV DEMO DATA** badge. It is only compiled in when `VITE_NETCHECK_DEMO=1`, and
-CI checks that the shipped bundle doesn't contain it.
-
-## Network use
-
-Netcheck makes exactly these requests, and nothing else:
-
-1. `GET https://api.steampowered.com/ISteamApps/GetSDRConfig/v1/?appid=730`, for
-   Valve's relay list. The last good response is cached in
-   `%APPDATA%\app.netcheck.desktop\sdr-config.json`. A cache under 12 hours old
-   is used immediately and refreshed in parallel with the pings. If Valve is
-   unreachable, any older cache is used and its age is shown.
-2. ICMP echo to relay IPs, your default gateway, 1.1.1.1, and each hop on the
-   route.
-3. TTL-limited ICMP echo for the traceroute.
-
-Fonts (Geist, Geist Mono), icons, flags and the world map are bundled. The CSP
-allows no remote origins. Relay IPs are never hardcoded.
-
-## How the measurements work
-
-**Per region.** Netcheck sends one quick echo to each relay in turn (up to
-four) and uses the first that answers. It then sends 20 echoes (configurable,
-10–100) at 100 ms intervals with a 1 s timeout and a 32-byte payload, the same
-as `ping.exe`. Sends don't wait for replies, so a 180 ms RTT doesn't stretch the
-100 ms interval. Up to 16 regions are measured at once, and your preferred
-region always goes first. A full check takes about 6–8 s.
-
-| Stat | Definition |
-|---|---|
-| min / avg / max | over the echoes that were answered |
-| p95 | nearest-rank 95th percentile |
-| jitter | mean absolute difference between consecutive answered RTTs |
-| loss | lost ÷ sent |
-
-**Grades.** Thresholds live in `config/thresholds.json` and can be changed in
-Settings. A region gets the best grade whose every limit it meets: average,
-jitter and loss.
-
-| Grade | Avg | Jitter | Loss | Meaning |
-|---|---|---|---|---|
-| Excellent | ≤ 50 ms | ≤ 4 ms | 0 % | Nothing to notice. |
-| Good | ≤ 90 ms | ≤ 10 ms | ≤ 2 % | Fine for competitive play. |
-| Playable | ≤ 150 ms | ≤ 25 ms | ≤ 5 % | You'll feel it in duels: peeker's advantage, occasional rubber-banding. |
-| Bad | anything worse | | | Expect lost shots and teleporting players. |
-
-Colour is always paired with an icon and a label (»  ✓  –  ✕), so the grades
-read without colour vision.
-
-**Blocked regions.** Netcheck reads Windows Firewall through `INetFwPolicy2`
-(read-only). A region is **Blocked by your firewall** when every relay sits in
-an enabled, outbound block rule that applies to CS2: no program set, or
-`cs2.exe`. The rule must also be enforced by a profile that is both switched on
-and active on your current network. For blocked regions Netcheck pings unblocked
-neighbours in the same /24 (relay ±1…±3) and labels the number **estimated**.
-If a block rule exists but the firewall is off for your network, Netcheck warns
-that the block does nothing.
-
-**Where's the problem.** Netcheck traces the route to your preferred region:
-TTL 1–15 are probed in parallel. Each hop that answers then gets 6 echoes. Hops
-are grouped into sections:
-
-- **Router**: TTL 1.
-- **ISP**: TTL 2–3, plus later private or CGNAT addresses.
-- **International**: everything after the ISP except the last hop.
-- **Valve**: the relay itself.
-
-The problem hop is the first where latency jumps more than 25 ms over the
-previous answering hop, or loss passes 5 %. Three corrections stop it from
-crying wolf:
-
-- **Nothing is blamed while your region is healthy.** No hop is reported unless
-  the destination itself is degraded.
-- **Spikes must carry through.** Routers deprioritise ICMP addressed to
-  themselves. A spike only counts if every later hop keeps it, and loss only
-  counts if the destination keeps it.
-- **Distance isn't congestion.** Each hop's lowest average in the last 30 days
-  is its "normal", and the rise it normally adds is subtracted. Until that
-  history exists, a perfectly stable rise on the international segment counts
-  as long-haul propagation, not a problem. (Tehran → Europe adds ~65 ms of
-  plain distance every night.)
-
-1.1.1.1 is measured as an "is the whole internet slow?" baseline. If 1.1.1.1 is
-bad and most regions are degraded, the verdict blames your ISP, not any one
-region.
-
-**History.** Every online check is saved to
-`%APPDATA%\app.netcheck.desktop\history.sqlite3` (SQLite, WAL) and kept for 30
-days. The History screen shows your preferred region by hour of day over the
-last 14 days, plus the best and worst hours.
-
-## Architecture
-
-```
-crates/netcheck-core/      platform logic, testable on any OS
-  icmp.rs        IcmpSendEcho2 behind a Prober trait; timed echo series
-  traceroute.rs  parallel TTL discovery + per-hop measurement
-  sdr.rs         Valve relay list: fetch, parse, disk cache
-  firewall.rs    INetFwPolicy2 reader (read-only) + pure block classification
-  store.rs       SQLite history, settings, retention
-  stats.rs       min/avg/p95/max/jitter/loss, grading
-  diagnosis.rs   route sections + problem-hop detection
-  check.rs       orchestration, one CancellationToken, streamed events
-  netinfo.rs     default gateway (GetIpForwardTable2)
-src-tauri/                 Tauri shell: commands, window lifecycle, shutdown
-src/                       React + TypeScript UI, one Zustand store
-```
-
-The app never modifies firewall rules, routes or any system setting.
-
-## Verification status
-
-Verified on Windows 11 (x86_64-pc-windows-gnu toolchain):
-
-- **Tests:** 71 Rust unit tests and the loopback ICMP integration test, which
-  runs the real `IcmpSendEcho2` path, all pass. The 10 frontend tests pass,
-  and strict `tsc` is clean.
-- **Ping accuracy:** compared with `ping -n 20` against live Valve relays:
-  Vienna 82.9 vs 82 ms (0.9 ms off), Frankfurt 88.2 vs 91 ms (2.8 ms off).
-  Both are inside the ±3 ms target.
-- **Lifecycle:** the release `netcheck.exe` was closed mid-check (3 s) and
-  after a check (14 s). Both times no `netcheck` process was left running.
-- **Real data:** the release build fetched Valve's live relay list and wrote
-  the history database.
-- **Firewall:** a real run found a block rule scoped to another Windows user
-  (a sandbox account) that Netcheck treated as blocking every region. Rules
-  limited by `LocalUserAuthorizedList` to other users, or to a Store app
-  package, are now ignored. A test covers this case.
-
-Still to check by hand: Launch CS2 with close-after-launch, and unplugging the
-cable on a real network.
-
-## Screenshots
-
-The release build on Windows 11, with a live connection:
-
-![Netcheck on Windows](docs/screenshots/real-windows.png)
-
-These come from the demo backend (synthetic data, marked DEV DEMO DATA). Run
-`pnpm dev:demo` and `scripts/screenshots.ps1` to regenerate them.
-
-| | |
-|---|---|
-| ![Verdict](docs/screenshots/unstable.png) | ![Map mid-sweep](docs/screenshots/map-sweep.png) |
-| ![Regions](docs/screenshots/regions.png) | ![Route](docs/screenshots/route.png) |
-| ![Offline](docs/screenshots/offline.png) | ![Light theme](docs/screenshots/light.png) |
+Counter-Strike, Counter-Strike 2 and Steam are trademarks of Valve Corporation.
+Netcheck is an independent project, not affiliated with or endorsed by Valve.

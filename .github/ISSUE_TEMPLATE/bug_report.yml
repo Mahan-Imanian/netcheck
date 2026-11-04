@@ -1,0 +1,54 @@
+name: Bug report
+description: Something in Netcheck is wrong, broken or misleading.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Netcheck shows IP addresses for your router and route hops, so blur them in screenshots if you'd rather not share them.
+        Security problems go through [private reporting](https://github.com/Mahan-Imanian/netcheck/security/advisories/new) instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Netcheck
+        2. ...
+  - type: input
+    id: version
+    attributes:
+      label: Netcheck version
+      description: Shown at the bottom right of the window.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: dropdown
+    id: network
+    attributes:
+      label: Connection
+      multiple: true
+      options:
+        - Wi-Fi
+        - Ethernet
+        - Mobile hotspot
+        - VPN or proxy active
+        - Region block rules in Windows Firewall
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: The Verdict and Route screens help most.

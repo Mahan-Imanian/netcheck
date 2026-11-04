@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (typecheck, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with: { version: 10 }
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: No demo code in the shipped bundle
+        run: "! grep -l 'createDemoBackend\\|DEV-ONLY' dist/assets/*.js"
+      - run: pnpm audit --prod
+
+  core:
+    name: Core (fmt, clippy, tests, bindings)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: "clippy, rustfmt" }
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - run: cargo test -p netcheck-core
+      - name: Generated TypeScript bindings are committed
+        run: git diff --exit-code src/bindings
+      - run: cargo clippy -p netcheck-core --all-targets -- -D warnings -W clippy::unwrap_used
+
+  windows:
+    name: Windows (ICMP tests, clippy, installer)
+    runs-on: windows-latest
+    needs: [frontend, core]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: clippy }
+      - uses: Swatinem/rust-cache@v2
+      - uses: pnpm/action-setup@v6
+        with: { version: 10 }
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Unit tests and the loopback ICMP integration test (real IcmpSendEcho2)
+        run: cargo test -p netcheck-core
+      - run: cargo clippy --workspace --all-targets -- -D warnings -W clippy::unwrap_used
+      - name: Build the per-user installer
+        run: pnpm tauri build --bundles nsis
+      - uses: actions/upload-artifact@v7
+        with:
+          name: netcheck-setup-${{ github.sha }}
+          path: target/release/bundle/nsis/*.exe
+          retention-days: 7
