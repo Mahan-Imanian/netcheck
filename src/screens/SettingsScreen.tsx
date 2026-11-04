@@ -93,7 +93,7 @@ export function SettingsScreen() {
   };
   const setLimit = (grade: "excellent" | "good" | "playable", patch: Partial<GradeLimit>) =>
     set({ thresholds: { ...draft.thresholds, [grade]: { ...draft.thresholds[grade], ...patch } } });
-  const preferredKnown = regions.some((r) => r.code === draft.preferredRegion);
+  const preferredKnown = draft.preferredRegion === "auto" || regions.some((r) => r.code === draft.preferredRegion);
   const closeValue = draft.closeAfterLaunch == null ? "ask" : draft.closeAfterLaunch ? "close" : "keep";
 
   return (
@@ -119,13 +119,14 @@ export function SettingsScreen() {
           </motion.button>
         </div>
         <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-6">
-          <Row label="Your region" hint="The hero readout, the route trace and the history all follow this region.">
+          <Row label="Your region" hint="The gauge, the route trace and the history follow this region. Automatic picks the fastest one each check.">
             <div className="relative w-[280px]">
               <select
                 value={draft.preferredRegion}
                 onChange={(e) => set({ preferredRegion: e.target.value })}
                 className="well h-8 w-full appearance-none pr-8 pl-3 text-[13px] text-text outline-none focus:border-accent/60"
               >
+                <option value="auto">Fastest region (automatic)</option>
                 {!preferredKnown && <option value={draft.preferredRegion}>{draft.preferredRegion.toUpperCase()}</option>}
                 {regions.map((r) => (
                   <option key={r.code} value={r.code}>

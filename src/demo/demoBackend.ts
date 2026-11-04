@@ -129,7 +129,7 @@ function firewallFor(scenario: Scenario): FirewallSummary {
   };
 }
 
-function routeFor(scenario: Scenario, target: string, rand: () => number): RouteResult {
+function routeFor(scenario: Scenario, target: string, rand: () => number, region: string): RouteResult {
   type H = [addr: string | null, ms: number, lost: number, seg: Segment, spread?: number];
   const base: H[] = [
     ["192.168.1.1", 1, 0, "Local"],
@@ -186,7 +186,7 @@ function routeFor(scenario: Scenario, target: string, rand: () => number): Route
   const problem = out[problemIdx];
   const prev = out[problemIdx - 1];
   return {
-    region: "vie",
+    region,
     target,
     estimated: false,
     hops: out,
@@ -232,7 +232,7 @@ export function createDemoBackend(params: URLSearchParams): Backend {
   const scenario = (params.get("scenario") ?? "normal") as Scenario;
   const speed = Number(params.get("speed") ?? "1") || 1;
   let settings: Settings = {
-    preferredRegion: "vie",
+    preferredRegion: params.get("region") ?? "vie",
     pingCount: 20,
     thresholds: defaults as Thresholds,
     closeAfterLaunch: null,
@@ -304,7 +304,11 @@ export function createDemoBackend(params: URLSearchParams): Backend {
       lanes[lane] = at;
       return { at, result: p.result };
     });
-    const vie = plan.find((p) => p.result.code === settings.preferredRegion);
+    const usable = plan.filter((p) => p.result.block.state !== "blocked" && p.result.stats?.avg != null);
+    const vie =
+      settings.preferredRegion === "auto"
+        ? usable.reduce<(typeof usable)[number] | undefined>((b, p) => (!b || (p.result.stats?.avg ?? Infinity) < (b.result.stats?.avg ?? Infinity) ? p : b), undefined)
+        : plan.find((p) => p.result.code === settings.preferredRegion);
     const events: Array<{ at: number; e: CheckEvent }> = schedule.map(({ at, result }) => ({ at, e: { kind: "region", result } }));
     const gateway = scenario === "wifi" ? statsOf(series(rand, 38, 14, 1, 10)) : statsOf(series(rand, 1, 0.4, 0, 10));
     const internet =
@@ -312,7 +316,7 @@ export function createDemoBackend(params: URLSearchParams): Backend {
     const baseline: Baseline = { gatewayIp: "192.168.1.1", gateway, internetIp: "1.1.1.1", internet };
     const last = Math.max(...schedule.map((s) => s.at));
     events.push({ at: 1250, e: { kind: "baseline", baseline } });
-    if (vie?.result.target) events.push({ at: last + 40, e: { kind: "route", route: routeFor(scenario, vie.result.target, rand) } });
+    if (vie?.result.target) events.push({ at: last + 40, e: { kind: "route", route: routeFor(scenario, vie.result.target, rand, vie.result.code) } });
     events.sort((a, b) => a.at - b.at);
 
     let clock = 0;

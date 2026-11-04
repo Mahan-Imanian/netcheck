@@ -139,12 +139,25 @@ describe("sorting and events", () => {
 
   it("folds check events into state", () => {
     const base = {
-      phase: "relays" as const, startedAtMs: null, finishedAtMs: null, preferred: "vie", relays: null, relayRefreshError: null, firewall: null,
+      phase: "relays" as const, startedAtMs: null, finishedAtMs: null, preferred: "vie", auto: false, relays: null, relayRefreshError: null, firewall: null,
       infos: {}, order: [], results: {}, arrival: [], baseline: null, route: null, offline: false, failure: null,
     };
     const r = region("vie", 82, "Good");
     const next = { ...base, ...reduce(base, { kind: "region", result: r }) };
     expect(next.arrival).toEqual(["vie"]);
     expect(reduce(next, { kind: "finished", checkId: 3, finishedAtMs: 5, offline: true })).toMatchObject({ phase: "done", offline: true });
+  });
+
+  it("follows the fastest region in automatic mode, and only there", () => {
+    const base = {
+      phase: "checking" as const, startedAtMs: null, finishedAtMs: null, preferred: "auto", auto: true, relays: null, relayRefreshError: null, firewall: null,
+      infos: {}, order: [], results: {}, arrival: [], baseline: null, route: null, offline: false, failure: null,
+    };
+    const one = { ...base, ...reduce(base, { kind: "region", result: region("vie", 82, "Good") }) };
+    expect(one.preferred).toBe("vie");
+    const two = { ...one, ...reduce(one, { kind: "region", result: region("fra", 60, "Good") }) };
+    expect(two.preferred).toBe("fra");
+    const pinned = { ...base, preferred: "vie", auto: false };
+    expect(reduce(pinned, { kind: "region", result: region("fra", 60, "Good") })).not.toHaveProperty("preferred");
   });
 });
