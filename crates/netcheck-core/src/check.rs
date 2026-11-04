@@ -13,7 +13,7 @@ use crate::diagnosis::{attach_normals, find_problem, Diagnosis, Hop};
 use crate::firewall::{BlockState, FirewallError, FirewallSnapshot, FirewallSummary};
 use crate::icmp::{self, Echo, IcmpError, SharedProber, DEFAULT_TTL};
 use crate::sdr::{Pop, RelayList, RelaySource};
-use crate::settings::Settings;
+use crate::settings::{Settings, AUTO_REGION};
 use crate::stats::{Grade, PingStats, Thresholds};
 use crate::traceroute;
 
@@ -278,6 +278,20 @@ async fn trace(
     Ok((target, discovery, hops))
 }
 
+fn play_score(r: &RegionResult) -> f64 {
+    match &r.stats {
+        Some(s) => s.avg.map_or(f64::INFINITY, |avg| avg + 2.0 * s.jitter.unwrap_or(0.0) + 8.0 * s.loss_pct),
+        None => f64::INFINITY,
+    }
+}
+
+pub fn fastest_region(regions: &[RegionResult]) -> Option<&RegionResult> {
+    regions
+        .iter()
+        .filter(|r| !matches!(r.block, BlockState::Blocked { .. }) && r.stats.as_ref().is_some_and(|s| s.avg.is_some()))
+        .min_by(|a, b| play_score(a).total_cmp(&play_score(b)))
+}
+
 fn no_answers(stats: Option<&PingStats>) -> bool {
     stats.is_none_or(|s| s.received == 0)
 }
@@ -320,10 +334,16 @@ pub async fn run(prober: SharedProber, inputs: CheckInputs, emit: Emit, cancel: 
             .collect(),
     });
 
-    let route_task = plans.iter().find(|p| p.pop.code == preferred && !p.candidates.is_empty()).map(|p| {
-        let task = tokio::spawn(trace(SharedProber::clone(&prober), p.candidates.clone(), cancel.clone()));
-        (p.estimated, task)
-    });
+    let traceable: HashMap<String, (bool, Vec<Ipv4Addr>)> =
+        plans.iter().filter(|p| !p.candidates.is_empty()).map(|p| (p.pop.code.clone(), (p.estimated, p.candidates.clone()))).collect();
+    let spawn_trace = |code: &str| {
+        traceable.get(code).map(|(estimated, candidates)| {
+            (*estimated, tokio::spawn(trace(SharedProber::clone(&prober), candidates.clone(), cancel.clone())))
+        })
+    };
+    let first_region = plans.first().map(|p| p.pop.code.clone());
+    let auto = preferred == AUTO_REGION;
+    let route_task = if auto { None } else { spawn_trace(&preferred) };
     let baseline_task = tokio::spawn(baseline(SharedProber::clone(&prober), inputs.gateway, cancel.clone()));
 
     let permits = Arc::new(Semaphore::new(CONCURRENCY));
@@ -352,6 +372,20 @@ pub async fn run(prober: SharedProber, inputs: CheckInputs, emit: Emit, cancel: 
         emit(CheckEvent::Region { result: result.clone() });
         regions.push(result);
     }
+
+    let (preferred, route_task) = match (auto, fastest_region(&regions)) {
+        (true, Some(best)) => {
+            let code = best.code.clone();
+            let task = spawn_trace(&code);
+            (code, task)
+        }
+        (true, None) => {
+            let code = first_region.unwrap_or(preferred);
+            let task = spawn_trace(&code);
+            (code, task)
+        }
+        (false, _) => (preferred, route_task),
+    };
 
     let baseline = baseline_task.await.map_err(|_| CheckError::Icmp(IcmpError::Worker))??;
     emit(CheckEvent::Baseline { baseline: baseline.clone() });
@@ -460,6 +494,28 @@ mod tests {
         assert!(matches!(events.first(), Some(CheckEvent::Started { .. })));
         assert_eq!(events.iter().filter(|e| matches!(e, CheckEvent::Region { .. })).count(), 3);
         assert!(!report.firewall.readable);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn auto_follows_the_fastest_region_and_an_explicit_pick_stays() {
+        let rtt =
+            HashMap::from([(ip("192.0.2.11"), 82.0), (ip("198.51.100.20"), 41.0), (ip("192.168.1.1"), 1.0), (INTERNET_BASELINE, 70.0)]);
+        let route = vec![(ip("192.168.1.1"), 1.0), (ip("198.51.100.20"), 41.0)];
+        let pops = || vec![pop("vie", &["192.0.2.11"]), pop("fra", &["198.51.100.20"])];
+
+        let prober: SharedProber = Arc::new(FakeProber { rtt: rtt.clone(), route: route.clone(), ..Default::default() });
+        let (emit, _) = collect();
+        let report = run(prober, inputs(pops(), Err(FirewallError::Unsupported)), emit, CancellationToken::new()).await.expect("ok");
+        assert_eq!(report.preferred, "fra");
+        assert_eq!(report.route.map(|r| r.region).as_deref(), Some("fra"));
+
+        let prober: SharedProber = Arc::new(FakeProber { rtt, route, ..Default::default() });
+        let mut pinned = inputs(pops(), Err(FirewallError::Unsupported));
+        pinned.settings.preferred_region = "vie".into();
+        let (emit, _) = collect();
+        let report = run(prober, pinned, emit, CancellationToken::new()).await.expect("ok");
+        assert_eq!(report.preferred, "vie");
+        assert_eq!(report.route.map(|r| r.region).as_deref(), Some("vie"));
     }
 
     #[tokio::test(start_paused = true)]

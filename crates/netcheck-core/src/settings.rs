@@ -3,6 +3,8 @@ use ts_rs::TS;
 
 use crate::stats::Thresholds;
 
+pub const AUTO_REGION: &str = "auto";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "lowercase")]
 #[ts(export)]
@@ -29,7 +31,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            preferred_region: "vie".into(),
+            preferred_region: AUTO_REGION.into(),
             ping_count: 20,
             thresholds: Thresholds::default(),
             close_after_launch: None,
@@ -47,7 +49,7 @@ impl Settings {
         self.ping_count = self.ping_count.clamp(Self::MIN_PINGS, Self::MAX_PINGS);
         self.preferred_region = self.preferred_region.trim().to_ascii_lowercase();
         if self.preferred_region.is_empty() {
-            self.preferred_region = "vie".into();
+            self.preferred_region = AUTO_REGION.into();
         }
         self
     }

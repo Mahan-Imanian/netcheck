@@ -63,6 +63,7 @@ function useVerdict() {
 
 function Hero() {
   const preferred = useApp((s) => s.preferred);
+  const auto = useApp((s) => s.auto);
   const info = useApp((s) => s.infos[s.preferred]);
   const result = useApp((s) => s.results[s.preferred]);
   const phase = useApp((s) => s.phase);
@@ -98,7 +99,7 @@ function Hero() {
           <div className="min-w-0">
             {info ? <h1 className="display text-[30px] leading-none font-bold tracking-[0.06em] uppercase">{info.city}</h1> : <Skeleton className="h-[22px] w-28" />}
             <div className="num mt-1 truncate text-[11.5px] text-text-3">
-              {preferred.toUpperCase()}
+              {auto ? "Fastest region" : preferred.toUpperCase()}
               {result?.target && <span className="max-[1100px]:hidden"> · {result.target}</span>}
             </div>
           </div>
