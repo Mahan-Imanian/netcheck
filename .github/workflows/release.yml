@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing tag to build, for example v0.1.0
+        description: Tag to build, for example v0.3.0. Created on the selected branch if it doesn't exist yet.
         required: true
 
 permissions:
@@ -21,7 +21,19 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ env.TAG }}
+          fetch-depth: 0
+      - name: Create the tag if it doesn't exist
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: |
+          git fetch --tags --force
+          if (-not (git tag -l $env:TAG)) {
+            git config user.name "Mahan Imanian"
+            git config user.email "252435250+Mahan-Imanian@users.noreply.github.com"
+            git tag -a $env:TAG -m "Netcheck $($env:TAG.TrimStart('v'))"
+            git push origin "refs/tags/$($env:TAG)"
+          }
+          git checkout --quiet $env:TAG
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: pnpm/action-setup@v6
