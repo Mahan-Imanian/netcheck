@@ -55,6 +55,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force out | Out-Null
           Copy-Item target/release/bundle/nsis/*.exe, target/release/bundle/msi/*.msi out/
+          Copy-Item target/release/netcheck.exe "out/Netcheck_$($env:TAG.TrimStart('v'))_x64-portable.exe"
           Get-ChildItem out | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name } | Set-Content out/SHA256SUMS.txt -Encoding ascii
 
       - name: Release notes from CHANGELOG.md
@@ -67,6 +68,23 @@ jobs:
           $rest = $lines[$start..($lines.Count - 1)]
           $end = ($rest | Select-String -Pattern '^## \[').LineNumber | Select-Object -First 1
           $body = if ($end) { $rest[0..($end - 2)] } else { $rest }
+          $sums = Get-Content out/SHA256SUMS.txt
+          $body += @(
+            "",
+            "## Install",
+            "",
+            "- ``Netcheck_${version}_x64-setup.exe`` installs for your user, with no admin rights needed.",
+            "- ``Netcheck_${version}_x64_en-US.msi`` installs for all users.",
+            "- ``Netcheck_${version}_x64-portable.exe`` runs without installing. It needs WebView2, which Windows 11 includes.",
+            "",
+            "Check a download with ``Get-FileHash .\<file> -Algorithm SHA256`` against:",
+            "",
+            '```'
+          ) + $sums + @(
+            '```',
+            "",
+            "The files are not code-signed, so SmartScreen will probably warn (More info, then Run anyway), and Smart App Control may block them. Built by the release workflow from the ``$env:TAG`` tag. Tested on Windows 11 only."
+          )
           $body | Set-Content notes.md -Encoding utf8
 
       - name: Create a draft release
