@@ -9,6 +9,7 @@ wrong, what it sends over the network, and how the code is put together.
 - [Blocked regions](#blocked-regions)
 - [Finding the problem on the route](#finding-the-problem-on-the-route)
 - [Network use and privacy](#network-use-and-privacy)
+- [Updates](#updates)
 - [Files on disk](#files-on-disk)
 - [Architecture](#architecture)
 - [Demo scenarios](#demo-scenarios)
@@ -41,7 +42,7 @@ sequenceDiagram
 
 A full check of about 45 regions takes around 10 seconds, depending on your connection. Closing the window cancels every probe
 in flight, flushes the history database and ends the process. Netcheck has no
-tray icon, service, autostart, updater or game watcher.
+tray icon, service, autostart, background updater or game watcher.
 
 ## Measurements
 
@@ -148,8 +149,12 @@ Netcheck makes exactly these requests, and nothing else:
 2. ICMP echo to relay IPs, your default gateway, 1.1.1.1, and each hop on the
    route.
 3. TTL-limited ICMP echo for the traceroute.
+4. `GET https://api.github.com/repos/Mahan-Imanian/netcheck/releases/latest`,
+   once when the window opens, after the first check finishes. Turn it off in
+   Settings under Updates. If you choose Update now, Netcheck also downloads
+   the installer from this repository's release page.
 
-There is no telemetry, account, analytics or update check. Fonts, icons, flags
+There is no telemetry, account or analytics. Fonts, icons, flags
 and the world map are bundled, the Content Security Policy allows no remote
 origins, and relay IPs are never hardcoded.
 
@@ -157,12 +162,31 @@ Netcheck never modifies firewall rules, routes or any system setting, and never
 reads or touches CS2, Steam or game files. **Launch CS2** opens
 `steam://rungameid/730`, the same link a desktop shortcut uses.
 
+## Updates
+
+When a newer release is published, Netcheck shows its version and notes and
+offers two choices. Later closes the dialog until the next launch. Update now
+downloads the installer that matches how Netcheck was installed, checks its
+SHA-256 against the digest GitHub publishes for that file, and refuses it if
+they differ. Then it starts the installer and closes.
+
+| Installed with | Update now runs |
+|---|---|
+| The setup `.exe` (a folder with `uninstall.exe`) | The new setup `.exe` in passive mode, which reopens Netcheck when it's done |
+| The `.msi` (under Program Files) | `msiexec /i` in passive mode. Windows asks for admin rights. |
+| The portable `.exe` | Nothing. The button opens the release page instead. |
+
+Only files from `github.com/Mahan-Imanian/netcheck/releases/download/` are
+accepted. The checksum proves the download matches what GitHub has for that
+release. Because the files aren't code-signed, it doesn't prove who built them.
+
 ## Files on disk
 
 | File | Purpose |
 |---|---|
 | `%APPDATA%\app.netcheck.desktop\sdr-config.json` | Last good relay list from Valve. |
 | `%APPDATA%\app.netcheck.desktop\history.sqlite3` | Every online check, kept for 30 days (SQLite, WAL). |
+| `%TEMP%\netcheck-update\` | The last update installer, only if you chose Update now. |
 
 Deleting the folder resets Netcheck's cache, history and settings.
 
@@ -203,6 +227,7 @@ flowchart TB
 | `diagnosis.rs` | Route sections and problem-hop detection. |
 | `check.rs` | Orchestration, cancellation and streamed events. |
 | `netinfo.rs` | Default gateway (`GetIpForwardTable2`). |
+| `update.rs` | Latest-release check, installer download and checksum. |
 
 The TypeScript types in `src/bindings/` are generated from the Rust structs by
 [ts-rs](https://github.com/Aleph-Alpha/ts-rs) during `cargo test`, so the UI and
@@ -215,6 +240,9 @@ the core can't drift apart. CI fails if they're out of date.
 
 `normal`, `unstable`, `congested`, `wifi`, `offline`, `blocked`, `allblocked`,
 `firewalloff`, `cache`, `norelays`, `longroute`.
+
+Add `&update=1` to show the update dialog, `&update=portable` for the
+portable build's version of it, or `&update=fail` to see a failed download.
 
 Add `&theme=light`, `&speed=0.5` or `&tab=regions` (or `map`, `route`,
 `history`, `settings`) as needed. Demo data uses only RFC 5737 documentation
@@ -254,7 +282,9 @@ doesn't use. Delete them before committing.
 pnpm tauri build
 ```
 
-This produces two installers:
+This produces two installers, plus the app itself at
+`target/release/netcheck.exe`, which the release workflow publishes as the
+portable build:
 
 - `target/release/bundle/nsis/Netcheck_<version>_x64-setup.exe` installs for
   the current user, without admin rights.
@@ -264,7 +294,7 @@ This produces two installers:
 The app itself never elevates: its manifest says `asInvoker`.
 
 Pushing a `v*` tag runs [`release.yml`](../.github/workflows/release.yml). It
-builds both installers on `windows-latest`, writes `SHA256SUMS.txt`, and
+builds both installers and the portable `.exe` on `windows-latest`, writes `SHA256SUMS.txt`, and
 creates a draft GitHub release with notes taken from `CHANGELOG.md`. If the
 `WINDOWS_CERTIFICATE` and `WINDOWS_CERTIFICATE_PASSWORD` secrets are set, the
 installers are signed. Without them they're built unsigned.

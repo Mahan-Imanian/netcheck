@@ -43,9 +43,11 @@ before a match starts. It doesn't block servers or change settings.
   with an estimated ping.
 - Keeps 14 days of history and shows your best and worst hours.
 - Launches CS2 through Steam.
+- Tells you when a new version is out, and installs it if you choose Update
+  now.
 
 It only runs while its window is open. There's no tray icon, service or
-updater, and it never needs admin rights.
+background updater, and it never needs admin rights.
 
 ## Screenshots
 
@@ -67,6 +69,8 @@ screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>
      rights needed. Most people want this one.
    - `Netcheck_<version>_x64_en-US.msi` installs for all users and asks for
      admin rights.
+   - `Netcheck_<version>_x64-portable.exe` runs without installing. It keeps
+     its settings and history in the same place as the installed app.
 2. Optionally, check that the download is intact. In PowerShell, in the folder
    you downloaded to:
 
@@ -116,6 +120,8 @@ doesn't need them either.
 - Launch CS2 opens `steam://rungameid/730`, the same link a desktop
   shortcut uses, so Steam needs to be installed. Launching the game, and the
   "close Netcheck after launching" option, haven't been tested end to end yet.
+- Update now hasn't been tested end to end yet, because 0.3.0 is the first
+  version that has it. The first real test is the update after 0.3.0.
 - Some VPNs and firewalls drop ICMP. Regions then show "no reply", even
   though the game itself may connect fine.
 - IPv4 only, like the relay addresses Valve publishes.
@@ -143,6 +149,7 @@ after a few checks.
 | Grade thresholds | Average, jitter and loss limits for each grade. Defaults live in [`config/thresholds.json`](config/thresholds.json). |
 | After launching CS2 | Close Netcheck, keep it open, or ask each time. |
 | Theme | System, dark or light. |
+| Updates | Check GitHub for a new release when Netcheck opens (the default), or don't. |
 | Map origin | Where the map's arcs start. Auto uses the location of your lowest-ping region. Custom lets you set it. |
 
 ## How it works
@@ -164,8 +171,9 @@ region is slow, the slowdown carries on to every later hop, and it's above that
 hop's usual latency.
 
 Netcheck downloads Valve's public relay list and sends ICMP echoes to the
-relays, your router, 1.1.1.1 and the hops on your route. It makes no other
-network requests: no telemetry, accounts or update checks.
+relays, your router, 1.1.1.1 and the hops on your route. When it opens, it
+also asks GitHub for the latest Netcheck release, unless you turn that off in
+Settings. It makes no other network requests: no telemetry or accounts.
 
 The exact rules, the files it writes and the architecture are in
 [docs/how-it-works.md](docs/how-it-works.md).
@@ -239,7 +247,7 @@ Planned, in no particular order. Ideas and pull requests are welcome in
 - [ ] Install with `winget` and Scoop
 - [ ] Other Steam Datagram Relay games that use the same relay list, such as Dota 2 and Deadlock
 - [ ] Translations
-- [ ] A portable build that doesn't need installing
+- [x] A portable build that doesn't need installing
 
 ## Contributing
 
