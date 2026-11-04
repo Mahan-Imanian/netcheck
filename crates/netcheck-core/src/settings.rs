@@ -26,6 +26,7 @@ pub struct Settings {
     pub theme: Theme,
     /// Where arcs on the map start. `None` estimates from the lowest-ping region.
     pub home_lon_lat: Option<(f64, f64)>,
+    pub check_updates: bool,
 }
 
 impl Default for Settings {
@@ -37,6 +38,7 @@ impl Default for Settings {
             close_after_launch: None,
             theme: Theme::System,
             home_lon_lat: None,
+            check_updates: true,
         }
     }
 }

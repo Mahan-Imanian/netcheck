@@ -3,6 +3,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { CheckEvent } from "../bindings/CheckEvent";
 import type { HistoryCell } from "../bindings/HistoryCell";
 import type { Settings } from "../bindings/Settings";
+import type { UpdateInfo } from "../bindings/UpdateInfo";
 import type { Backend } from "./backend";
 
 interface Commands {
@@ -12,6 +13,9 @@ interface Commands {
   cancel_check: { args: Record<string, never>; result: null };
   history: { args: { code: string; days: number }; result: HistoryCell[] };
   launch_cs2: { args: Record<string, never>; result: null };
+  check_update: { args: Record<string, never>; result: UpdateInfo | null };
+  install_update: { args: { onProgress: Channel<[number, number]> }; result: null };
+  open_release_page: { args: Record<string, never>; result: null };
   quit: { args: Record<string, never>; result: null };
 }
 
@@ -36,6 +40,15 @@ export function createTauriBackend(): Backend {
     history: (code, days) => call("history", { code, days }),
     launchCs2: async () => {
       await call("launch_cs2", {});
+    },
+    checkUpdate: () => call("check_update", {}),
+    installUpdate: async (onProgress) => {
+      const channel = new Channel<[number, number]>();
+      channel.onmessage = ([done, total]) => onProgress(done, total);
+      await call("install_update", { onProgress: channel });
+    },
+    openReleasePage: async () => {
+      await call("open_release_page", {});
     },
     quit: async () => {
       await call("quit", {});

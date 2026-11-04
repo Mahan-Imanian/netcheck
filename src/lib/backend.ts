@@ -1,6 +1,7 @@
 import type { CheckEvent } from "../bindings/CheckEvent";
 import type { HistoryCell } from "../bindings/HistoryCell";
 import type { Settings } from "../bindings/Settings";
+import type { UpdateInfo } from "../bindings/UpdateInfo";
 
 export interface WindowControls {
   show(): Promise<void>;
@@ -19,6 +20,9 @@ export interface Backend {
   cancelCheck(): Promise<void>;
   history(code: string, days: number): Promise<HistoryCell[]>;
   launchCs2(): Promise<void>;
+  checkUpdate(): Promise<UpdateInfo | null>;
+  installUpdate(onProgress: (done: number, total: number) => void): Promise<void>;
+  openReleasePage(): Promise<void>;
   quit(): Promise<void>;
   window: WindowControls;
 }

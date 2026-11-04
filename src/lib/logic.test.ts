@@ -9,6 +9,7 @@ import type { RouteResult } from "../bindings/RouteResult";
 import type { Thresholds } from "../bindings/Thresholds";
 import { playWindows } from "./history";
 import { sortRegions } from "./regions";
+import { megabytes, parseNotes } from "./releaseNotes";
 import { explainRoute } from "./routeText";
 import { reduce } from "./store";
 import { computeVerdict, type VerdictInput } from "./verdict";
@@ -159,5 +160,22 @@ describe("sorting and events", () => {
     expect(two.preferred).toBe("fra");
     const pinned = { ...base, preferred: "vie", auto: false };
     expect(reduce(pinned, { kind: "region", result: region("fra", 60, "Good") })).not.toHaveProperty("preferred");
+  });
+});
+
+describe("release notes", () => {
+  it("turns changelog markdown into headings and items", () => {
+    const notes = "## Added\n\n- Update check with a `Later` button.\n- See [the docs](https://example.com)\n  for details.\n\n## Fixed\n\n- **Map** pins.";
+    expect(parseNotes(notes)).toEqual([
+      { kind: "heading", text: "Added" },
+      { kind: "item", text: "Update check with a Later button." },
+      { kind: "item", text: "See the docs for details." },
+      { kind: "heading", text: "Fixed" },
+      { kind: "item", text: "Map pins." },
+    ]);
+  });
+
+  it("formats download sizes in megabytes", () => {
+    expect(megabytes(4_269_297)).toBe("4.3");
   });
 });

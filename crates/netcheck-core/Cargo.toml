@@ -13,6 +13,7 @@ tokio-util = "0.7"
 reqwest = { version = "0.13", default-features = false, features = ["native-tls"] }
 rusqlite = { version = "0.41", features = ["bundled"] }
 ts-rs = "12"
+sha2 = "0.11.1"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62", features = [
