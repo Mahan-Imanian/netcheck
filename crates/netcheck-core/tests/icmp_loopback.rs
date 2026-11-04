@@ -23,16 +23,10 @@ fn loopback_echo_through_icmpsendecho2() {
 #[tokio::test]
 async fn loopback_series_has_no_loss() {
     let prober: SharedProber = Arc::new(SystemProber);
-    let samples = icmp::series(
-        &prober,
-        Ipv4Addr::LOCALHOST,
-        20,
-        Duration::from_millis(100),
-        Duration::from_secs(1),
-        &CancellationToken::new(),
-    )
-    .await
-    .expect("series");
+    let samples =
+        icmp::series(&prober, Ipv4Addr::LOCALHOST, 20, Duration::from_millis(100), Duration::from_secs(1), &CancellationToken::new())
+            .await
+            .expect("series");
     let stats = PingStats::from_samples(samples);
     assert_eq!((stats.sent, stats.received), (20, 20));
     assert!(stats.avg.is_some_and(|a| a < 10.0));

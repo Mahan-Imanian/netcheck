@@ -120,9 +120,7 @@ async fn run_check(state: State<'_, AppState>, on_event: Channel<CheckEvent>) ->
         },
     };
 
-    let firewall = tokio::task::spawn_blocking(firewall::read)
-        .await
-        .unwrap_or_else(|_| Err(FirewallError::Com("reader stopped".into())));
+    let firewall = tokio::task::spawn_blocking(firewall::read).await.unwrap_or_else(|_| Err(FirewallError::Com("reader stopped".into())));
     let gateway = tokio::task::spawn_blocking(netinfo::default_gateway).await.ok().flatten();
 
     let inputs = CheckInputs {
@@ -193,6 +191,13 @@ pub fn run() {
         .setup(|app| {
             let state = setup_state(app.handle()).map_err(|e| Box::new(e) as Box<dyn std::error::Error>)?;
             app.manage(state);
+            let handle = app.handle().clone();
+            std::thread::spawn(move || {
+                std::thread::sleep(Duration::from_secs(4));
+                if let Some(window) = handle.get_webview_window("main") {
+                    let _ = window.show();
+                }
+            });
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -200,15 +205,7 @@ pub fn run() {
                 shutdown(window.app_handle());
             }
         })
-        .invoke_handler(tauri::generate_handler![
-            get_settings,
-            save_settings,
-            history,
-            run_check,
-            cancel_check,
-            launch_cs2,
-            quit
-        ])
+        .invoke_handler(tauri::generate_handler![get_settings, save_settings, history, run_check, cancel_check, launch_cs2, quit])
         .build(tauri::generate_context!());
 
     match app {

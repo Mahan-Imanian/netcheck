@@ -1,11 +1,11 @@
 {
   "name": "netcheck",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:demo": "VITE_NETCHECK_DEMO=1 vite",
+    "dev:demo": "vite --mode demo",
     "build": "tsc --noEmit -p . && vite build",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",

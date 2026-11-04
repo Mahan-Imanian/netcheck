@@ -82,12 +82,7 @@ pub async fn discover(
 
 /// Pings every hop that answered `probes` times and returns hops grouped
 /// into route sections.
-pub async fn measure(
-    prober: &SharedProber,
-    discovery: &Discovery,
-    probes: u32,
-    cancel: &CancellationToken,
-) -> Result<Vec<Hop>, IcmpError> {
+pub async fn measure(prober: &SharedProber, discovery: &Discovery, probes: u32, cancel: &CancellationToken) -> Result<Vec<Hop>, IcmpError> {
     let mut set = JoinSet::new();
     for (i, raw) in discovery.hops.iter().enumerate() {
         let Some(addr) = raw.addr else { continue };

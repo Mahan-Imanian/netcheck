@@ -21,9 +21,17 @@ pub enum IcmpError {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Echo {
-    Reply { from: Ipv4Addr, rtt_ms: f64 },
-    TtlExpired { from: Ipv4Addr, rtt_ms: f64 },
-    Unreachable { from: Option<Ipv4Addr> },
+    Reply {
+        from: Ipv4Addr,
+        rtt_ms: f64,
+    },
+    TtlExpired {
+        from: Ipv4Addr,
+        rtt_ms: f64,
+    },
+    Unreachable {
+        from: Option<Ipv4Addr>,
+    },
     Timeout,
     /// The OS has no route out: cable unplugged, Wi-Fi off, adapter down.
     NoRoute,
