@@ -343,6 +343,7 @@ export function createDemoBackend(params: URLSearchParams): Backend {
       document.body.dataset.demoQuit = "1";
     },
     window: {
+      show: async () => {},
       minimize: async () => {},
       toggleMaximize: async () => {},
       close: async () => {},

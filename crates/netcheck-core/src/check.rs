@@ -131,9 +131,15 @@ pub enum CheckEvent {
         firewall: FirewallSummary,
         regions: Vec<RegionInfo>,
     },
-    Region { result: RegionResult },
-    Baseline { baseline: Baseline },
-    Route { route: RouteResult },
+    Region {
+        result: RegionResult,
+    },
+    Baseline {
+        baseline: Baseline,
+    },
+    Route {
+        route: RouteResult,
+    },
     #[serde(rename_all = "camelCase")]
     RelayRefresh {
         ok: bool,
@@ -150,7 +156,11 @@ pub enum CheckEvent {
         offline: bool,
     },
     #[serde(rename_all = "camelCase")]
-    Failed { message: String, offline: bool, has_cache: bool },
+    Failed {
+        message: String,
+        offline: bool,
+        has_cache: bool,
+    },
 }
 
 pub type Emit = Arc<dyn Fn(CheckEvent) + Send + Sync>;
@@ -192,11 +202,7 @@ fn plan(pop: &Pop, firewall: Option<&FirewallSnapshot>) -> Plan {
     Plan { pop: pop.clone(), block, candidates, estimated }
 }
 
-async fn select_target(
-    prober: &SharedProber,
-    candidates: &[Ipv4Addr],
-    cancel: &CancellationToken,
-) -> Result<Option<Ipv4Addr>, CheckError> {
+async fn select_target(prober: &SharedProber, candidates: &[Ipv4Addr], cancel: &CancellationToken) -> Result<Option<Ipv4Addr>, CheckError> {
     for ip in candidates.iter().take(MAX_CANDIDATES) {
         if cancel.is_cancelled() {
             return Err(CheckError::Cancelled);
@@ -374,17 +380,7 @@ pub async fn run(prober: SharedProber, inputs: CheckInputs, emit: Emit, cancel: 
         && no_answers(baseline.gateway.as_ref())
         && no_answers(baseline.internet.as_ref());
 
-    Ok(CheckReport {
-        started_at_ms,
-        finished_at_ms: (inputs.now_ms)(),
-        preferred,
-        relays,
-        firewall,
-        regions,
-        baseline,
-        route,
-        offline,
-    })
+    Ok(CheckReport { started_at_ms, finished_at_ms: (inputs.now_ms)(), preferred, relays, firewall, regions, baseline, route, offline })
 }
 
 #[cfg(test)]

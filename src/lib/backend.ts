@@ -3,6 +3,7 @@ import type { HistoryCell } from "../bindings/HistoryCell";
 import type { Settings } from "../bindings/Settings";
 
 export interface WindowControls {
+  show(): Promise<void>;
   minimize(): Promise<void>;
   toggleMaximize(): Promise<void>;
   close(): Promise<void>;

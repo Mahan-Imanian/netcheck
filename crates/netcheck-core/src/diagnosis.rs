@@ -148,10 +148,7 @@ pub fn find_problem(hops: &[Hop], limit: &ProblemHopLimit, destination_degraded:
         let jump = rise > limit.jump_ms
             && !propagation
             && downstream.iter().all(|h| excess_rise(prev, h).is_some_and(|r| r > limit.jump_ms * 0.8));
-        let loss_persists = dest.map_or_else(
-            || downstream.iter().all(|h| h.loss() > limit.loss_pct),
-            |d| d.loss() > limit.loss_pct,
-        );
+        let loss_persists = dest.map_or_else(|| downstream.iter().all(|h| h.loss() > limit.loss_pct), |d| d.loss() > limit.loss_pct);
         let loss = hop.loss() > limit.loss_pct && (hop.is_destination || loss_persists);
 
         if jump || loss {
@@ -348,12 +345,7 @@ mod tests {
 
     #[test]
     fn unreached_destination_reports_where_route_dies() {
-        let r = route(vec![
-            hop(1, "192.168.1.1", steady(1.0), false),
-            hop(2, "10.20.0.1", noisy(20.0, 4), false),
-            silent(3),
-            silent(4),
-        ]);
+        let r = route(vec![hop(1, "192.168.1.1", steady(1.0), false), hop(2, "10.20.0.1", noisy(20.0, 4), false), silent(3), silent(4)]);
         let d = find_problem(&r, &Thresholds::default().problem_hop, true);
         assert!(!d.reached_destination);
         assert_eq!(d.finding.map(|f| f.ttl), Some(2));

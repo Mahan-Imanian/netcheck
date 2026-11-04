@@ -43,6 +43,7 @@ function useBoot() {
       if (!alive) return;
       const settings = await backend.getSettings();
       useApp.setState({ backend, settings, preferred: settings.preferredRegion });
+      window.setTimeout(() => void backend.window.show(), 30);
       const demoTab = backend.demo ? new URLSearchParams(window.location.search).get("tab") : null;
       if (demoTab && demoTab in SCREENS) useApp.getState().setTab(demoTab as Tab);
       void useApp.getState().startCheck();

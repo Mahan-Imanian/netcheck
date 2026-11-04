@@ -220,8 +220,7 @@ impl Store {
 
     pub fn load_settings(&self) -> Result<Settings, StoreError> {
         self.with(|c| {
-            let raw: Option<String> =
-                c.query_row("SELECT value FROM settings WHERE key = 'settings'", [], |r| r.get(0)).optional()?;
+            let raw: Option<String> = c.query_row("SELECT value FROM settings WHERE key = 'settings'", [], |r| r.get(0)).optional()?;
             Ok(match raw {
                 Some(json) => serde_json::from_str::<Settings>(&json).unwrap_or_default().sanitized(),
                 None => Settings::default(),

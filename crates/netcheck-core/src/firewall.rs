@@ -152,9 +152,16 @@ pub enum BlockState {
     Open,
     /// Every relay sits in an enforced block rule.
     #[serde(rename_all = "camelCase")]
-    Blocked { rule: String, group: String, blocks_icmp: bool },
+    Blocked {
+        rule: String,
+        group: String,
+        blocks_icmp: bool,
+    },
     /// A matching block rule exists but no active profile enforces it.
-    Inactive { rule: String, group: String },
+    Inactive {
+        rule: String,
+        group: String,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
@@ -188,11 +195,7 @@ impl FirewallSnapshot {
         let Some(rules) = matched else { return BlockState::Open };
         let first = rules[0];
         if rules.iter().all(|r| self.enforced(r)) && self.profiles.enforcing() != 0 {
-            BlockState::Blocked {
-                rule: first.name.clone(),
-                group: first.group.clone(),
-                blocks_icmp: rules.iter().all(|r| r.blocks_icmp()),
-            }
+            BlockState::Blocked { rule: first.name.clone(), group: first.group.clone(), blocks_icmp: rules.iter().all(|r| r.blocks_icmp()) }
         } else {
             BlockState::Inactive { rule: first.name.clone(), group: first.group.clone() }
         }
@@ -253,17 +256,17 @@ pub fn read() -> Result<FirewallSnapshot, FirewallError> {
 mod windows_impl {
     use windows::core::{Interface, PWSTR};
     use windows::Win32::Foundation::{CloseHandle, LocalFree, HANDLE, HLOCAL, VARIANT_BOOL};
-    use windows::Win32::Security::Authorization::ConvertSidToStringSidW;
-    use windows::Win32::Security::{GetTokenInformation, TokenUser, TOKEN_QUERY, TOKEN_USER};
-    use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
     use windows::Win32::NetworkManagement::WindowsFirewall::{
         INetFwPolicy2, INetFwRule, INetFwRule3, NetFwPolicy2, NET_FW_ACTION_BLOCK, NET_FW_PROFILE2_DOMAIN, NET_FW_PROFILE2_PRIVATE,
         NET_FW_PROFILE2_PUBLIC, NET_FW_RULE_DIR_OUT,
     };
+    use windows::Win32::Security::Authorization::ConvertSidToStringSidW;
+    use windows::Win32::Security::{GetTokenInformation, TokenUser, TOKEN_QUERY, TOKEN_USER};
     use windows::Win32::System::Com::{
         CoCreateInstance, CoInitializeEx, CoUninitialize, IDispatch, CLSCTX_INPROC_SERVER, COINIT_MULTITHREADED,
     };
     use windows::Win32::System::Ole::IEnumVARIANT;
+    use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
     use windows::Win32::System::Variant::VARIANT;
 
     use super::*;

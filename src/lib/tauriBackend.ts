@@ -41,6 +41,7 @@ export function createTauriBackend(): Backend {
       await call("quit", {});
     },
     window: {
+      show: () => win.show(),
       minimize: () => win.minimize(),
       toggleMaximize: () => win.toggleMaximize(),
       close: () => win.close(),
