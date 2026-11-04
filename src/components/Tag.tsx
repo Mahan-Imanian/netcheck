@@ -28,8 +28,8 @@ export function Tag({ kind }: { kind: keyof typeof KINDS }) {
   return (
     <span
       title={k.title}
-      className="inline-flex h-[20px] items-center gap-1 rounded-xs px-1.5 text-[10.5px] font-medium tracking-wide whitespace-nowrap uppercase"
-      style={{ color: k.color, background: `color-mix(in srgb, ${k.color} 11%, transparent)` }}
+      className="inline-flex h-[22px] items-center gap-1 rounded-full px-2 text-[11.5px] font-medium whitespace-nowrap"
+      style={{ color: k.color, background: `color-mix(in srgb, ${k.color} 12%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${k.color} 22%, transparent)` }}
     >
       <Icon size={11} strokeWidth={2.25} aria-hidden />
       {k.label}

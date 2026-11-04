@@ -52,13 +52,13 @@ describe("verdict", () => {
   it("says good to play when the preferred region is clean", () => {
     const v = computeVerdict(input([region("vie", 82, "Good"), region("fra", 87, "Good")]));
     expect(v.kind).toBe("clean");
-    expect(v.line).toBe("Good to play — Vienna 82 ms, 0% loss.");
+    expect(v.line).toBe("Vienna 82 ms, 0% loss.");
   });
 
   it("points to a clean alternative when the preferred region is unstable", () => {
     const v = computeVerdict(input([region("vie", 82, "Playable", { loss: 5 }), region("fra", 87, "Good")]));
     expect(v.kind).toBe("unstable");
-    expect(v.line).toBe("Vienna is unstable right now — Frankfurt is 5 ms behind and clean.");
+    expect(v.line).toBe("Vienna is unstable right now. Frankfurt is 5 ms behind and clean.");
     expect(v.alternative?.code).toBe("fra");
   });
 

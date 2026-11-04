@@ -26,7 +26,7 @@ function ReCheck() {
       type="button"
       whileTap={{ scale: 0.97 }}
       onClick={() => void startCheck()}
-      className="inline-flex h-10 items-center gap-2 rounded-md bg-accent px-4 text-[13px] font-semibold text-accent-ink shadow-[inset_0_1px_0_rgb(255_255_255/0.4)] transition-[filter] duration-150 hover:brightness-110"
+      className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-[13px] font-semibold text-accent-ink shadow-[inset_0_1px_0_rgb(255_255_255/0.4)] transition-[filter] duration-150 hover:brightness-110"
     >
       <RotateCw size={14} strokeWidth={2.4} /> Re-check
       <kbd className="num rounded-xs border border-black/20 px-1 text-[10px] opacity-70">R</kbd>
@@ -93,13 +93,13 @@ export function OfflineScreen() {
           </div>
           <h1 className="mt-3 text-[30px] leading-tight font-semibold tracking-[-0.025em]">You're offline</h1>
           <p className="mt-2 max-w-[460px] text-[14px] text-text-2">
-            Nothing answers — not your router, not the internet. Netcheck didn't save this check to your history.
+            Nothing answers, not your router and not the internet. Netcheck didn't save this check to your history.
           </p>
           <div className="mt-7">
             <BrokenChain cutAfter={0} />
           </div>
           <ol className="mt-7 space-y-1.5 text-[13px] text-text-2">
-            {["Check that Wi-Fi is connected, or that the cable is plugged in.", "If other devices are offline too, restart your router.", "Then re-check — it takes about six seconds."].map((t, i) => (
+            {["Check that Wi-Fi is connected, or that the cable is plugged in.", "If other devices are offline too, restart your router.", "Then re-check. It takes about six seconds."].map((t, i) => (
               <li key={t} className="flex gap-3">
                 <span className="num text-text-3">{String(i + 1).padStart(2, "0")}</span>
                 {t}

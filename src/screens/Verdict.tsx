@@ -21,12 +21,12 @@ import { FirewallWarning } from "./States";
 
 function Stat({ label, value, unit, tone }: { label: string; value: string; unit?: string; tone?: string }) {
   return (
-    <div className="min-w-0">
-      <div className="eyebrow">{label}</div>
-      <div className="num mt-1 text-[19px] leading-none font-semibold tracking-[-0.02em]" style={{ color: tone }}>
+    <div className="min-w-0 px-4 first:pl-0">
+      <div className="num text-[20px] leading-none font-semibold tracking-[-0.03em]" style={{ color: tone }}>
         {value}
         {unit && <span className="ml-0.5 text-[11px] font-normal text-text-3">{unit}</span>}
       </div>
+      <div className="mt-1.5 text-[11.5px] text-text-3">{label}</div>
     </div>
   );
 }
@@ -80,89 +80,106 @@ function Hero() {
   return (
     <section className="panel flex min-h-0 flex-col overflow-hidden" aria-label="Verdict">
       <div
-        className="pointer-events-none absolute inset-0 transition-[background] duration-500"
+        className="pointer-events-none absolute inset-0 rounded-[inherit] transition-[background] duration-700"
         style={{
-          background: `radial-gradient(120% 70% at 0% 0%, color-mix(in srgb, ${color} 13%, transparent), transparent 60%), radial-gradient(80% 60% at 100% 100%, var(--nc-wash-2), transparent 70%)`,
+          background: `radial-gradient(90% 55% at 12% 0%, color-mix(in srgb, ${color} 20%, transparent), transparent 62%), radial-gradient(70% 50% at 100% 100%, var(--nc-wash-2), transparent 70%)`,
         }}
         aria-hidden
       />
-      <div className="grid-texture pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(180deg,black,transparent_70%)]" aria-hidden />
 
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-6 pt-5 [@media(max-height:700px)]:pt-4">
-        <div className="flex items-center gap-2">
-          <span className="eyebrow">Your region</span>
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-7 pt-6 [@media(max-height:700px)]:px-6 [@media(max-height:700px)]:pt-4">
+        <div className="flex items-center gap-3">
+          <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full shadow-[0_0_0_1px_var(--nc-line-2)]">
+            <Flag code={preferred} size={26} />
+          </span>
+          <div className="min-w-0">
+            {info ? <h1 className="text-[22px] leading-tight font-semibold tracking-[-0.03em]">{info.city}</h1> : <Skeleton className="h-[22px] w-28" />}
+            <div className="num truncate text-[11.5px] text-text-3">
+              {preferred.toUpperCase()}
+              {result?.target && <span className="max-[1100px]:hidden"> · {result.target}</span>}
+            </div>
+          </div>
           <span className="flex-1" />
           {result?.block.state === "blocked" && <Tag kind="blocked" />}
           {result?.estimated && <Tag kind="estimated" />}
           {result?.block.state === "inactive" && <Tag kind="inactive" />}
+          {result ? <GradePill tone={tone} size="lg" /> : <Skeleton className="h-7 w-24 rounded-full" />}
         </div>
 
-        <div className="mt-2.5 flex items-center gap-2.5">
-          <Flag code={preferred} size={22} />
-          {info ? (
-            <h1 className="text-[22px] leading-none font-semibold tracking-[-0.02em]">{info.city}</h1>
-          ) : (
-            <Skeleton className="h-[22px] w-28" />
-          )}
-          <span className="num text-[12px] text-text-3">{preferred.toUpperCase()}</span>
-          {result?.target && <span className="num ml-auto text-[11px] text-text-3 max-[1100px]:hidden">{result.target}</span>}
-        </div>
-
-        <div className="mt-3 flex items-end gap-4">
+        <div className="mt-5 flex items-end gap-3 [@media(max-height:700px)]:mt-3">
           {s?.avg != null ? (
             <motion.div
-              className="num flex items-baseline leading-[0.82] font-semibold"
-              style={{ color }}
-              animate={done && !reduce ? { textShadow: [`0 0 0px transparent`, `0 0 42px color-mix(in srgb, ${color} 70%, transparent)`, `0 0 24px color-mix(in srgb, ${color} 40%, transparent)`] } : undefined}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="num flex items-baseline leading-[0.8] font-semibold"
+              initial={false}
+              animate={
+                done && !reduce
+                  ? {
+                      filter: [
+                        "drop-shadow(0 0 0px transparent)",
+                        `drop-shadow(0 0 34px color-mix(in srgb, ${color} 75%, transparent))`,
+                        `drop-shadow(0 0 16px color-mix(in srgb, ${color} 40%, transparent))`,
+                      ],
+                    }
+                  : undefined
+              }
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="text-[clamp(64px,15vh,136px)] tracking-[-0.06em]" style={{ opacity: done ? 1 : 0.82 }}>
+              <span
+                className="text-[clamp(72px,17vh,152px)] tracking-[-0.07em]"
+                style={{
+                  opacity: done ? 1 : 0.85,
+                  background: `linear-gradient(180deg, color-mix(in srgb, ${color} 50%, white) 0%, ${color} 72%)`,
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
                 <CountUp value={s.avg} duration={0.6} />
               </span>
-              <span className="ml-2 text-[22px] font-medium tracking-normal text-text-3">ms</span>
+              <span className="ml-2 text-[24px] font-medium tracking-normal text-text-3">ms</span>
             </motion.div>
           ) : result ? (
-            <div className="num text-[clamp(64px,15vh,136px)] leading-[0.82] font-semibold tracking-[-0.06em] text-muted">—</div>
+            <div className="num text-[clamp(72px,17vh,152px)] leading-[0.8] font-semibold tracking-[-0.07em] text-muted">--</div>
           ) : (
-            <Skeleton className="h-[clamp(54px,12.5vh,112px)] w-[230px]" />
+            <Skeleton className="h-[clamp(60px,14vh,128px)] w-[240px]" />
           )}
-          <div className="pb-1.5">{result ? <GradePill tone={tone} size="lg" /> : <Skeleton className="h-7 w-24 rounded-full" />}</div>
         </div>
-        <div className="mt-2 text-[11.5px] text-text-3">
+        <div className="mt-2.5 text-[12px] text-text-3">
           {s
-            ? `average of ${s.received}/${s.sent} replies${result?.normalMs != null ? ` · usually ${ms(result.normalMs)} ms` : ""}${result?.estimated ? " · estimated from a neighbouring address" : ""}`
+            ? `Average of ${s.received}/${s.sent} replies${result?.normalMs != null ? `, usually ${ms(result.normalMs)} ms` : ""}${result?.estimated ? ", estimated from a neighbouring address" : ""}`
             : " "}
         </div>
 
-        <div className="mt-4 grid grid-cols-4 gap-3 border-y border-line py-3.5 [@media(max-height:700px)]:mt-3 [@media(max-height:700px)]:py-2.5">
+        <div className="mt-5 grid grid-cols-4 divide-x divide-line [@media(max-height:700px)]:mt-3">
           {s ? (
             <>
-              <Stat label="Loss" value={pct(s.lossPct)} unit="%" tone={s.lossPct > 0 ? "var(--nc-bad)" : undefined} />
+              <Stat label="Packet loss" value={pct(s.lossPct)} unit="%" tone={s.lossPct > 0 ? "var(--nc-bad)" : undefined} />
               <Stat label="Jitter" value={ms(s.jitter, 1)} unit="ms" />
-              <Stat label="p95" value={ms(s.p95)} unit="ms" />
-              <Stat label="Min–max" value={`${ms(s.min)}–${ms(s.max)}`} />
+              <Stat label="Worst 5%" value={ms(s.p95)} unit="ms" />
+              <Stat label="Range" value={`${ms(s.min)}-${ms(s.max)}`} />
             </>
           ) : (
             Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="space-y-2">
+              <div key={i} className="space-y-2 px-4 first:pl-0">
+                <Skeleton className="h-[20px] w-14" />
                 <Skeleton className="h-2.5 w-10" />
-                <Skeleton className="h-[19px] w-14" />
               </div>
             ))
           )}
         </div>
 
-        <div className="mt-3 flex min-h-10 flex-1 flex-col">
-          <div className="flex justify-between text-[10.5px] text-text-3">
-            <span className="eyebrow">Every ping</span>
-            {s && <span className="num">{s.samples.length} × 100 ms</span>}
+        <div className="well relative mt-5 flex min-h-16 flex-1 flex-col overflow-hidden px-3.5 pt-2.5 pb-2 [@media(max-height:700px)]:mt-3">
+          <div className="grid-texture pointer-events-none absolute inset-0 opacity-80" aria-hidden />
+          <div className="relative flex justify-between text-[11px] text-text-3">
+            <span>Live trace</span>
+            {s && <span className="num">{s.samples.length} pings, 100 ms apart</span>}
           </div>
-          <div className="mt-1.5 max-h-[170px] min-h-8 flex-1">
-            {s ? <Sparkline samples={s.samples} width={520} height={60} color={color} fluid /> : <Skeleton className="size-full opacity-50" />}
+          <div className="relative mt-1 max-h-[170px] min-h-8 flex-1">
+            {s ? <Sparkline samples={s.samples} width={520} height={60} color={color} fluid /> : <Skeleton className="size-full opacity-40" />}
           </div>
           {s?.avg != null && (
-            <div className="mt-5 hidden [@media(min-height:900px)]:block">
-              <div className="eyebrow mb-2">Distribution</div>
+            <div className="relative mt-4 hidden [@media(min-height:900px)]:block">
+              <div className="mb-2 text-[11px] text-text-3">Distribution</div>
               <Histogram stats={s} color={color} bins={32} className="h-[90px]" />
             </div>
           )}
@@ -170,33 +187,33 @@ function Hero() {
 
         <motion.div
           key={verdict?.kind ?? "none"}
-          initial={reduce ? false : { opacity: 0, y: 6 }}
+          initial={reduce ? false : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-4 flex items-start gap-3 [@media(max-height:700px)]:mt-3"
+          transition={{ type: "spring", stiffness: 260, damping: 28 }}
+          className="mt-5 flex items-start gap-3 [@media(max-height:700px)]:mt-3"
           aria-live="polite"
         >
           <span
-            className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full"
-            style={{ color: vTone.color, background: `color-mix(in srgb, ${vTone.color} 14%, transparent)` }}
+            className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full"
+            style={{ color: vTone.color, background: `color-mix(in srgb, ${vTone.color} 15%, transparent)`, boxShadow: `0 0 24px -6px ${vTone.color}` }}
           >
-            <VIcon size={15} strokeWidth={2.4} aria-hidden />
+            <VIcon size={16} strokeWidth={2.4} aria-hidden />
           </span>
           <div className="min-w-0">
-            <div className="text-[12px] font-semibold tracking-wide uppercase" style={{ color: vTone.color }}>
+            <div className="text-[13px] font-semibold" style={{ color: vTone.color }}>
               {verdict?.headline ?? "Measuring"}
             </div>
-            <p className="mt-0.5 text-[15px] leading-snug text-pretty text-text">{verdict?.line ?? "Pinging every Valve region…"}</p>
+            <p className="mt-0.5 text-[16px] leading-snug font-medium tracking-[-0.01em] text-pretty text-text">{verdict?.line ?? "Pinging every Valve region"}</p>
           </div>
         </motion.div>
 
-        {alt?.stats?.avg != null && altInfo && done && (
+        {alt?.stats?.avg != null && altInfo && done && alt.stats.avg < (s?.avg ?? Infinity) && (
           <motion.div
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="well mt-3 flex items-center gap-2.5 px-3 py-2 [@media(max-height:700px)]:hidden"
+            className="well mt-3 flex items-center gap-2.5 px-3.5 py-2.5 [@media(max-height:700px)]:hidden"
           >
-            <span className="eyebrow">Best right now</span>
+            <span className="text-[12px] text-text-3">Best right now</span>
             <Flag code={alt.code} size={16} />
             <span className="truncate text-[13px] font-medium">{altInfo.city}</span>
             <span className="num ml-auto text-[14px] font-semibold">
@@ -210,17 +227,27 @@ function Hero() {
 
         {cacheNote != null && (
           <p className="mt-3 flex items-center gap-1.5 text-[11.5px] text-playable">
-            <CloudOff size={12} /> Valve's API didn't answer — using the relay list from {age(cacheNote, Date.now())}.
+            <CloudOff size={12} /> Valve's API didn't answer, so this uses the relay list from {age(cacheNote, Date.now())}.
           </p>
         )}
-        <div className="h-4 shrink-0" />
+        <div className="h-5 shrink-0" />
       </div>
 
-      <div className="relative border-t border-line bg-s1/60 px-6 py-4 [@media(max-height:700px)]:py-3">
+      <div className="relative px-7 pb-6 [@media(max-height:700px)]:px-6 [@media(max-height:700px)]:pb-4">
         <LaunchButton disabled={!done} />
-        <p className="mt-2 text-center text-[11px] text-text-3 [@media(max-height:700px)]:hidden">{done ? "Opens CS2 through Steam" : "Available when the check finishes"}</p>
+        <p className="mt-2.5 text-center text-[11.5px] text-text-3 [@media(max-height:700px)]:hidden">{done ? "Opens CS2 through Steam" : "Available when the check finishes"}</p>
       </div>
     </section>
+  );
+}
+
+function SectionHead({ title, children }: { title: React.ReactNode; children?: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2">
+      <h2 className="text-[13px] font-semibold tracking-[-0.01em] text-text">{title}</h2>
+      <span className="flex-1" />
+      {children}
+    </div>
   );
 }
 
@@ -231,28 +258,18 @@ function RouteCard() {
   const infos = useApp((s) => s.infos);
   const verdict = useVerdict();
   const alt = verdict?.alternative;
-  const explanation = route
-    ? explainRoute(route, alt?.stats?.avg != null ? { city: infos[alt.code]?.city ?? alt.code, avg: alt.stats.avg } : null)
-    : null;
+  const explanation = route ? explainRoute(route, alt?.stats?.avg != null ? { city: infos[alt.code]?.city ?? alt.code, avg: alt.stats.avg } : null) : null;
   const bad = route?.diagnosis.finding != null;
 
   return (
-    <section className="panel shrink-0 px-4 pt-3 pb-3.5" aria-label="Route summary">
-      <div className="flex items-center gap-2">
-        <span className="eyebrow">Route to {info?.city ?? "your region"}</span>
-        <span className="flex-1" />
-        <button
-          type="button"
-          onClick={() => setTab("route")}
-          className="group inline-flex items-center gap-1 text-[11.5px] font-medium text-text-2 transition-colors duration-150 hover:text-accent"
-        >
+    <section className="panel shrink-0 px-5 pt-4 pb-4" aria-label="Route summary">
+      <SectionHead title={`Route to ${info?.city ?? "your region"}`}>
+        <button type="button" onClick={() => setTab("route")} className="group inline-flex items-center gap-1 text-[12px] font-medium text-text-2 transition-colors duration-150 hover:text-accent">
           All hops <ArrowRight size={12} className="transition-transform duration-200 group-hover:translate-x-0.5" />
         </button>
-      </div>
-      <p className={`mt-1 truncate text-[13px] font-medium ${bad ? "text-bad" : "text-text"}`}>
-        {explanation ? explanation.title : <Skeleton className="mt-1 h-3.5 w-52" />}
-      </p>
-      <div className="mt-3">{route ? <RouteChain route={route} compact /> : <RouteChainSkeleton compact />}</div>
+      </SectionHead>
+      <div className={`mt-0.5 truncate text-[12.5px] ${bad ? "text-bad" : "text-text-2"}`}>{explanation ? explanation.title : <Skeleton className="mt-1 h-3.5 w-52" />}</div>
+      <div className="mt-3.5">{route ? <RouteChain route={route} compact /> : <RouteChainSkeleton compact />}</div>
     </section>
   );
 }
@@ -265,19 +282,23 @@ function Fastest() {
   const preferred = useApp((s) => s.preferred);
   const blockedCount = Object.values(results).filter((r) => r.block.state === "blocked").length;
   const top = useMemo(
-    () => Object.values(results).filter((r) => r.stats?.avg != null && r.block.state !== "blocked").sort((a, b) => playScore(a) - playScore(b)).slice(0, 6),
+    () =>
+      Object.values(results)
+        .filter((r) => r.stats?.avg != null && r.block.state !== "blocked")
+        .sort((a, b) => playScore(a) - playScore(b))
+        .slice(0, 6),
     [results],
   );
   return (
-    <section className="panel shrink-0 px-4 pt-3 pb-2.5" aria-label="Fastest regions">
-      <div className="eyebrow">Fastest {phase === "done" ? "right now" : "so far"}</div>
-      <ol className="mt-2 grid grid-flow-col grid-cols-2 grid-rows-3 gap-x-5">
+    <section className="panel shrink-0 px-5 pt-4 pb-3" aria-label="Fastest regions">
+      <SectionHead title={phase === "done" ? "Fastest right now" : "Fastest so far"} />
+      <ol className="mt-2.5 grid grid-flow-col grid-cols-2 grid-rows-3 gap-x-2 gap-y-1">
         {Array.from({ length: 6 }, (_, i) => {
           const r = top[i];
-          if (!r && phase === "done") return <li key={`e${i}`} aria-hidden />;
+          if (!r && phase === "done") return null;
           if (!r) {
             return (
-              <li key={`s${i}`} className="flex h-[27px] items-center gap-2.5 border-b border-line">
+              <li key={`s${i}`} className="flex h-[30px] items-center gap-2.5 px-2">
                 <Skeleton className="h-2.5 w-3" />
                 <Skeleton className="h-2.5 w-24" />
                 <Skeleton className="ml-auto h-2.5 w-8" />
@@ -286,19 +307,21 @@ function Fastest() {
           }
           const tone = resultTone(r);
           const Icon = TONES[tone].icon;
+          const c = TONES[tone].color;
           return (
             <motion.li
               key={r.code}
               layout={reduce ? false : "position"}
               transition={{ type: "spring", stiffness: 400, damping: 36 }}
-              className="flex h-[27px] items-center gap-2.5 border-b border-line text-[12.5px]"
+              className="relative flex h-[30px] items-center gap-2.5 overflow-hidden rounded-[10px] px-2 text-[12.5px]"
+              style={{ background: i === 0 ? `linear-gradient(90deg, color-mix(in srgb, ${c} 14%, transparent), transparent 80%)` : undefined }}
             >
-              <span className="num w-3 text-[10.5px] text-text-3">{i + 1}</span>
+              <span className="num w-3 text-[11px] text-text-3">{i + 1}</span>
               <Flag code={r.code} size={15} />
-              <span className={`truncate ${r.code === preferred ? "font-semibold" : ""}`}>{infos[r.code]?.city}</span>
+              <span className={`truncate ${r.code === preferred ? "font-semibold text-text" : "text-text-2"}`}>{infos[r.code]?.city}</span>
               <span className="ml-auto inline-flex items-center gap-1.5">
-                <Icon size={12} strokeWidth={2.5} style={{ color: TONES[tone].color }} aria-label={TONES[tone].label} />
-                <span className="num w-7 text-right font-semibold" style={{ color: TONES[tone].color }}>
+                <Icon size={12} strokeWidth={2.5} style={{ color: c }} aria-label={TONES[tone].label} />
+                <span className="num w-7 text-right font-semibold" style={{ color: c }}>
                   <CountUp value={r.stats?.avg ?? null} />
                 </span>
               </span>
@@ -307,7 +330,7 @@ function Fastest() {
         })}
       </ol>
       {phase === "done" && top.length < 6 && (
-        <p className="-mt-[54px] pl-[50%] text-[11.5px] leading-snug text-text-3">
+        <p className="mt-2 px-2 text-[11.5px] leading-snug text-text-3">
           {blockedCount > 0 ? `${blockedCount} other regions are blocked by your firewall, so CS2 can't use them.` : "No other region answered."}
         </p>
       )}
@@ -338,22 +361,18 @@ export function VerdictScreen() {
   const done = useApp((s) => s.arrival.length);
   const checking = phase === "checking" || phase === "relays";
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-3">
+    <div className="flex h-full min-h-0 flex-col gap-3 px-4 pt-1 pb-3">
       <FirewallWarning />
-      <div className="grid min-h-0 flex-1 grid-cols-[minmax(410px,0.9fr)_1.1fr] gap-3">
+      <div className="grid min-h-0 flex-1 grid-cols-[minmax(420px,0.92fr)_1.08fr] gap-3">
         <Hero />
         <div className="flex min-h-0 flex-col gap-3">
           <section className="panel relative flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="Live map">
-            <div className="grid-texture pointer-events-none absolute inset-0" aria-hidden />
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{ background: "radial-gradient(70% 80% at 50% 45%, var(--nc-wash-1), transparent 70%)" }}
-              aria-hidden
-            />
-            <div className="relative flex items-center gap-3 px-4 pt-3">
-              <span className="eyebrow">{checking ? "Sweeping Valve regions" : "Every Valve region"}</span>
+            <div className="grid-texture pointer-events-none absolute inset-0 rounded-[inherit]" aria-hidden />
+            <div className="pointer-events-none absolute inset-0 rounded-[inherit]" style={{ background: "radial-gradient(70% 80% at 50% 45%, var(--nc-wash-1), transparent 70%)" }} aria-hidden />
+            <div className="relative flex items-center gap-3 px-5 pt-4">
+              <h2 className="text-[13px] font-semibold tracking-[-0.01em]">{checking ? "Sweeping Valve regions" : "Every Valve region"}</h2>
               {checking && total > 0 && (
-                <span className="num text-[11px] text-accent">
+                <span className="num text-[11.5px] text-accent">
                   {done} / {total}
                 </span>
               )}

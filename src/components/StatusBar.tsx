@@ -36,7 +36,7 @@ export function StatusBar() {
   const p = firewall?.profiles;
 
   return (
-    <footer className="flex h-7 shrink-0 items-center gap-3 overflow-hidden border-t border-line bg-s1 px-3.5 text-[11px] whitespace-nowrap text-text-3">
+    <footer className="flex h-8 shrink-0 items-center gap-3 overflow-hidden px-5 text-[11px] whitespace-nowrap text-text-3">
       {relays ? (
         <span className={`inline-flex items-center gap-1.5 ${unreachable ? "text-playable" : ""}`} title={relays.liveError ?? refreshError ?? undefined}>
           {unreachable ? <CloudOff size={12} /> : <Database size={12} />}
@@ -59,7 +59,7 @@ export function StatusBar() {
       )}
       {firewall?.warnInactive && (
         <span className="inline-flex items-center gap-1 text-playable">
-          <ShieldAlert size={12} /> Block rule does nothing — firewall is off
+          <ShieldAlert size={12} /> Block rule does nothing while the firewall is off
         </span>
       )}
       <Sep />
@@ -75,7 +75,7 @@ export function StatusBar() {
       </span>
       <span className="flex-1" />
       {demo && (
-        <span className="inline-flex items-center gap-1 rounded-xs bg-playable/15 px-1.5 py-px font-semibold tracking-wide text-playable uppercase">
+        <span className="inline-flex items-center gap-1 rounded-full bg-playable/15 px-2 py-px font-semibold text-playable">
           <FlaskConical size={11} /> Dev demo data
         </span>
       )}

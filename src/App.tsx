@@ -43,6 +43,8 @@ function useBoot() {
       if (!alive) return;
       const settings = await backend.getSettings();
       useApp.setState({ backend, settings, preferred: settings.preferredRegion });
+      const demoTab = backend.demo ? new URLSearchParams(window.location.search).get("tab") : null;
+      if (demoTab && demoTab in SCREENS) useApp.getState().setTab(demoTab as Tab);
       void useApp.getState().startCheck();
       void useApp.getState().loadHistory();
     })();
@@ -109,10 +111,14 @@ export function App() {
   useShortcuts();
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex h-full flex-col bg-bg">
-        <TitleBar />
-        <Content />
-        <StatusBar />
+      <div className="relative flex h-full flex-col overflow-hidden bg-bg">
+        <div className="aurora" aria-hidden />
+        <div className="grain" aria-hidden />
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+          <TitleBar />
+          <Content />
+          <StatusBar />
+        </div>
       </div>
     </MotionConfig>
   );

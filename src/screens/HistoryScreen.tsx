@@ -36,7 +36,7 @@ export function HistoryScreen() {
   const city = info?.city ?? preferred.toUpperCase();
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-[1fr_260px] gap-3 p-3">
+    <div className="grid h-full min-h-0 grid-cols-[1fr_260px] gap-3 px-4 pt-1 pb-3">
       <section className="panel flex min-h-0 flex-col p-5" aria-label="History heatmap">
         <div className="flex items-baseline gap-2.5">
           <Flag code={preferred} size={18} />
@@ -92,11 +92,11 @@ export function HistoryScreen() {
         <div className="mt-3 flex h-5 items-center gap-4 text-[11.5px] text-text-3">
           {hover ? (
             <span className="num text-text-2">
-              {dayLabel(hover.day)} · {hourLabel(hover.hour)} — <span className="font-semibold text-text">{ms(hover.avgMs)} ms</span> avg, {pct(hover.lossPct)}% loss,{" "}
+              {dayLabel(hover.day)} · {hourLabel(hover.hour)}: <span className="font-semibold text-text">{ms(hover.avgMs)} ms</span> avg, {pct(hover.lossPct)}% loss,{" "}
               {hover.samples} check{hover.samples === 1 ? "" : "s"}
             </span>
           ) : (
-            <span>Hover a cell for details. Hatched cells are hours with no check — Netcheck only measures while it's open.</span>
+            <span>Hover a cell for details. Hatched cells are hours with no check, because Netcheck only measures while it's open.</span>
           )}
         </div>
       </section>
@@ -124,7 +124,7 @@ export function HistoryScreen() {
               </div>
               <div className="num mt-2 text-[26px] leading-none font-semibold tracking-[-0.04em]">{hourLabel(windows.worst.hour)}</div>
               <p className="mt-2 text-[12.5px] text-text-2">
-                <span className="num font-semibold text-text">{ms(windows.worst.avg)} ms</span> typical — {ms(windows.worst.avg - windows.best.avg)} ms worse than your best hour.
+                <span className="num font-semibold text-text">{ms(windows.worst.avg)} ms</span> typical, {ms(windows.worst.avg - windows.best.avg)} ms worse than your best hour.
               </p>
             </section>
           </>

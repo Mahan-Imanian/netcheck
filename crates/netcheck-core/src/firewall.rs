@@ -78,12 +78,28 @@ pub struct BlockRule {
     pub protocol: i32,
     pub application: String,
     pub remote: Vec<AddrSpec>,
+    pub other_users_only: bool,
+}
+
+/// Whether a rule's `LocalUserAuthorizedList` / `LocalAppPackageId` limits it to
+/// someone other than `user_sid`, so it can't affect CS2 run by this user.
+pub fn scoped_to_other_users(local_users_sddl: &str, package: &str, user_sid: Option<&str>) -> bool {
+    if !package.trim().is_empty() {
+        return true;
+    }
+    let sddl = local_users_sddl.trim();
+    if sddl.is_empty() {
+        return false;
+    }
+    let everyone = [";;;WD)", ";;;AU)", ";;;IU)", ";;;BU)"].iter().any(|a| sddl.contains(a));
+    let me = user_sid.is_some_and(|sid| sddl.contains(&format!(";;;{sid})")));
+    !(everyone || me)
 }
 
 impl BlockRule {
     fn applies_to_cs2(&self) -> bool {
         let app = self.application.to_ascii_lowercase();
-        app.is_empty() || app.ends_with("\\cs2.exe")
+        !self.other_users_only && (app.is_empty() || app.ends_with("\\cs2.exe"))
     }
 
     fn is_candidate(&self) -> bool {
@@ -235,10 +251,13 @@ pub fn read() -> Result<FirewallSnapshot, FirewallError> {
 
 #[cfg(windows)]
 mod windows_impl {
-    use windows::core::Interface;
-    use windows::Win32::Foundation::VARIANT_BOOL;
+    use windows::core::{Interface, PWSTR};
+    use windows::Win32::Foundation::{CloseHandle, LocalFree, HANDLE, HLOCAL, VARIANT_BOOL};
+    use windows::Win32::Security::Authorization::ConvertSidToStringSidW;
+    use windows::Win32::Security::{GetTokenInformation, TokenUser, TOKEN_QUERY, TOKEN_USER};
+    use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
     use windows::Win32::NetworkManagement::WindowsFirewall::{
-        INetFwPolicy2, INetFwRule, NetFwPolicy2, NET_FW_ACTION_BLOCK, NET_FW_PROFILE2_DOMAIN, NET_FW_PROFILE2_PRIVATE,
+        INetFwPolicy2, INetFwRule, INetFwRule3, NetFwPolicy2, NET_FW_ACTION_BLOCK, NET_FW_PROFILE2_DOMAIN, NET_FW_PROFILE2_PRIVATE,
         NET_FW_PROFILE2_PUBLIC, NET_FW_RULE_DIR_OUT,
     };
     use windows::Win32::System::Com::{
@@ -279,6 +298,7 @@ mod windows_impl {
         };
 
         let enumerator: IEnumVARIANT = unsafe { policy.Rules().map_err(com)?._NewEnum().map_err(com)? }.cast().map_err(com)?;
+        let user_sid = current_user_sid();
         let mut rules = Vec::new();
         loop {
             let mut slot = [VARIANT::default()];
@@ -289,19 +309,45 @@ mod windows_impl {
             }
             let Ok(dispatch) = IDispatch::try_from(&slot[0]) else { continue };
             let Ok(rule) = dispatch.cast::<INetFwRule>() else { continue };
-            if let Some(parsed) = parse_rule(&rule) {
+            if let Some(parsed) = parse_rule(&rule, user_sid.as_deref()) {
                 rules.push(parsed);
             }
         }
         Ok(FirewallSnapshot { profiles, rules })
     }
 
-    fn parse_rule(rule: &INetFwRule) -> Option<BlockRule> {
+    fn current_user_sid() -> Option<String> {
+        unsafe {
+            let mut token = HANDLE::default();
+            OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token).ok()?;
+            let mut len = 0u32;
+            let _ = GetTokenInformation(token, TokenUser, None, 0, &mut len);
+            let mut buf = vec![0u64; (len as usize).div_ceil(8)];
+            let got = GetTokenInformation(token, TokenUser, Some(buf.as_mut_ptr().cast()), len, &mut len);
+            let _ = CloseHandle(token);
+            got.ok()?;
+            let user = &*(buf.as_ptr() as *const TOKEN_USER);
+            let mut text = PWSTR::null();
+            ConvertSidToStringSidW(user.User.Sid, &mut text).ok()?;
+            let sid = text.to_string().ok();
+            let _ = LocalFree(Some(HLOCAL(text.0.cast())));
+            sid
+        }
+    }
+
+    fn parse_rule(rule: &INetFwRule, user_sid: Option<&str>) -> Option<BlockRule> {
         unsafe {
             if rule.Action().ok()? != NET_FW_ACTION_BLOCK {
                 return None;
             }
             let remote = rule.RemoteAddresses().map(|b| b.to_string()).unwrap_or_default();
+            let (users, package) = match rule.cast::<INetFwRule3>() {
+                Ok(r3) => (
+                    r3.LocalUserAuthorizedList().map(|b| b.to_string()).unwrap_or_default(),
+                    r3.LocalAppPackageId().map(|b| b.to_string()).unwrap_or_default(),
+                ),
+                Err(_) => (String::new(), String::new()),
+            };
             Some(BlockRule {
                 name: rule.Name().map(|b| b.to_string()).unwrap_or_default(),
                 group: rule.Grouping().map(|b| b.to_string()).unwrap_or_default(),
@@ -312,6 +358,7 @@ mod windows_impl {
                 protocol: rule.Protocol().unwrap_or(PROTO_ANY),
                 application: rule.ApplicationName().map(|b| b.to_string()).unwrap_or_default(),
                 remote: parse_remote_addresses(&remote),
+                other_users_only: scoped_to_other_users(&users, &package, user_sid),
             })
         }
     }
@@ -336,7 +383,24 @@ mod tests {
             protocol: PROTO_ANY,
             application: String::new(),
             remote: parse_remote_addresses(remote),
+            other_users_only: false,
         }
+    }
+
+    #[test]
+    fn rules_scoped_to_another_user_or_package_do_not_block() {
+        let me = "S-1-5-21-1-2-3-1000";
+        let sandbox = "O:LSD:(A;;CC;;;S-1-5-21-1-2-3-1003)";
+        assert!(scoped_to_other_users(sandbox, "", Some(me)));
+        assert!(!scoped_to_other_users("O:LSD:(A;;CC;;;S-1-5-21-1-2-3-1000)", "", Some(me)));
+        assert!(!scoped_to_other_users("O:LSD:(A;;CC;;;WD)", "", Some(me)));
+        assert!(!scoped_to_other_users("", "", Some(me)));
+        assert!(scoped_to_other_users("", "S-1-15-2-1", Some(me)));
+
+        let mut r = rule("codex_sandbox_offline_block_outbound", "0.0.0.0-126.255.255.255,128.0.0.0-255.255.255.255");
+        r.other_users_only = scoped_to_other_users(sandbox, "", Some(me));
+        let fw = FirewallSnapshot { profiles: fw_on(), rules: vec![r] };
+        assert_eq!(fw.classify(&[ip("146.66.155.66")]), BlockState::Open);
     }
 
     fn fw_on() -> ProfileState {

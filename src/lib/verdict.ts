@@ -63,7 +63,7 @@ export function computeVerdict(input: VerdictInput): Verdict {
   });
 
   if (input.offline) {
-    return v("offline", "bad", "You're offline", "Nothing answers — not your router, not the internet. Check Wi-Fi or the cable.", undefined);
+    return v("offline", "bad", "You're offline", "Nothing answers, not your router and not the internet. Check Wi-Fi or the cable.", undefined);
   }
 
   const gw = baseline?.gateway;
@@ -72,11 +72,11 @@ export function computeVerdict(input: VerdictInput): Verdict {
       "wifi",
       "bad",
       "Your Wi-Fi is the problem",
-      `Your router answers in ${ms(gw.avg)} ms with ${pct(gw.lossPct)}% loss — every region will feel it. Move closer or use a cable.`,
+      `Your router answers in ${ms(gw.avg)} ms with ${pct(gw.lossPct)}% loss, so every region will feel it. Move closer or use a cable.`,
     );
   }
   if (input.route?.diagnosis.finding?.segment === "Local") {
-    return v("wifi", "bad", "Your Wi-Fi is the problem", "The first hop — your own router — is slow or dropping packets. Every region will feel it.");
+    return v("wifi", "bad", "Your Wi-Fi is the problem", "The first hop, your own router, is slow or dropping packets. Every region will feel it.");
   }
 
   if (!pref && !input.finished) {
@@ -91,7 +91,7 @@ export function computeVerdict(input: VerdictInput): Verdict {
       "isp",
       "bad",
       "Your ISP is congested",
-      "Your internet is congested at your ISP — expect high ping everywhere, including 1.1.1.1.",
+      "Your internet is congested at your ISP. Expect high ping everywhere, including 1.1.1.1.",
     );
   }
 
@@ -117,7 +117,7 @@ export function computeVerdict(input: VerdictInput): Verdict {
       "noReply",
       "bad",
       `${prefCity} isn't answering`,
-      alt ? `${prefCity} isn't answering right now — ${cityOf(input, alt.code)} is best at ${ms(alt.stats?.avg)} ms.` : `${prefCity} isn't answering, and no other region is clean.`,
+      alt ? `${prefCity} isn't answering right now. ${cityOf(input, alt.code)} is best at ${ms(alt.stats?.avg)} ms.` : `${prefCity} isn't answering, and no other region is clean.`,
       alt,
     );
   }
@@ -125,7 +125,7 @@ export function computeVerdict(input: VerdictInput): Verdict {
   const s = pref.stats;
   const avg = s.avg ?? 0;
   if (isClean(pref)) {
-    return v("clean", pref.grade === "Excellent" ? "excellent" : "good", "Good to play", `Good to play — ${prefCity} ${ms(avg)} ms, ${pct(s.lossPct)}% loss${est}.`);
+    return v("clean", pref.grade === "Excellent" ? "excellent" : "good", "Good to play", `${prefCity} ${ms(avg)} ms, ${pct(s.lossPct)}% loss${est}.`);
   }
 
   const unstable = s.lossPct > 0 || (s.jitter ?? 0) > t.good.jitterMs;
@@ -138,7 +138,7 @@ export function computeVerdict(input: VerdictInput): Verdict {
       unstable ? "unstable" : "slow",
       tone,
       unstable ? `${prefCity} is unstable` : `${prefCity} is slow`,
-      `${prefCity} is ${unstable ? "unstable" : "slow"} right now${est} — ${altCity} is ${rel} and clean.`,
+      `${prefCity} is ${unstable ? "unstable" : "slow"} right now${est}. ${altCity} is ${rel} and clean.`,
     );
   }
   const usual = pref.normalMs != null && avg - pref.normalMs > t.problemHop.jumpMs ? ` (usually ${ms(pref.normalMs)} ms)` : "";
@@ -146,7 +146,7 @@ export function computeVerdict(input: VerdictInput): Verdict {
     "rough",
     tone,
     "Not a good night",
-    `${prefCity} is at ${ms(avg)} ms with ${pct(s.lossPct)}% loss${usual}${est}, and no region is clean — expect a rough match.`,
+    `${prefCity} is at ${ms(avg)} ms with ${pct(s.lossPct)}% loss${usual}${est}, and no region is clean. Expect a rough match.`,
     undefined,
   );
 }

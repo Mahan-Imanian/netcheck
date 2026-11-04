@@ -29,7 +29,7 @@ export function RouteScreen() {
   let prevAvg = 0;
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-3">
+    <div className="flex h-full min-h-0 flex-col gap-3 px-4 pt-1 pb-3">
       <section className="panel relative shrink-0 overflow-hidden" aria-label="Route">
         <div className="grid-texture pointer-events-none absolute inset-0 opacity-70" aria-hidden />
         <div className="relative px-5 pt-4">

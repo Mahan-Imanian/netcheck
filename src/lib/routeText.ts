@@ -84,7 +84,7 @@ export function explainRoute(route: RouteResult, alternative: { city: string; av
       return {
         title: "Valve's side",
         body: `Everything up to Valve is fine. Only Valve's relay (${at}) is the problem: ${jump}.`,
-        advice: alt ? `This is on Valve's end — ${alt}.` : "This is on Valve's end. Try another region.",
+        advice: alt ? `This is on Valve's end. ${alt}.` : "This is on Valve's end. Try another region.",
       };
   }
 }

@@ -150,7 +150,7 @@ export function RegionsScreen() {
   const skeletonRows = phase === "relays" || (phase === "checking" && list.length === 0);
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-3">
+    <div className="flex h-full min-h-0 flex-col gap-3 px-4 pt-1 pb-3">
       <FirewallWarning />
       {everyBlocked && (
         <div role="status" className="flex shrink-0 items-center gap-3 rounded-md border border-blocked/30 bg-blocked/10 px-4 py-2.5 text-[12.5px]">

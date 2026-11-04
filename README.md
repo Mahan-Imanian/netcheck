@@ -11,8 +11,11 @@ flight, flushes the history database and ends the process.
 
 ## Build
 
-Requirements: Rust (stable), Node 22, pnpm 10. Windows builds need the MSVC
-toolchain and WebView2. The MSI also needs WiX, which the Tauri CLI fetches.
+Requirements: Rust (stable), Node 22+, pnpm 9+ and WebView2. On Windows either
+the MSVC toolchain or the GNU toolchain (`x86_64-pc-windows-gnu` plus a MinGW-w64
+GCC on `PATH`) works. With GNU, keep the Rust and MinGW installs in a path
+without spaces, because `ld` can't handle spaces. The MSI also needs WiX, which
+the Tauri CLI fetches.
 
 ```bash
 pnpm install
@@ -185,21 +188,25 @@ The app never modifies firewall rules, routes or any system setting.
 
 ## Verification status
 
-What has been verified, and how:
+Verified on Windows 11 (x86_64-pc-windows-gnu toolchain):
 
-- **Verified on Linux:** 45 Rust unit tests and 10 frontend tests. Strict
-  `tsc`. Clippy with `-D warnings` on the Windows target. The Windows code
-  type-checks, and a release `netcheck.exe` plus an NSIS installer
-  cross-compile with mingw. The exe imports `IcmpSendEcho2`,
-  `GetIpForwardTable2` and `CoCreateInstance`, and its manifest says
-  `asInvoker`. Every screen was screenshotted at 960×620, 1200×760 and
-  1920×1080, in both themes and with reduced motion, using the demo backend.
-- **Needs a Windows machine:** run `scripts/verify-windows.ps1 -Relay <ip>`.
-  It compares Netcheck's ICMP path with `ping -n 20` (target ±3 ms) and checks
-  that no `netcheck` process survives closing the window, both mid-check and
-  after one. Still to check by hand: Launch CS2 and close-after-launch, the
-  firewall-off warning, blocked/estimated labels with real rules, and unplugging
-  the cable.
+- **Tests:** 71 Rust unit tests and the loopback ICMP integration test, which
+  runs the real `IcmpSendEcho2` path, all pass. The 10 frontend tests pass,
+  and strict `tsc` is clean.
+- **Ping accuracy:** compared with `ping -n 20` against live Valve relays:
+  Vienna 82.9 vs 82 ms (0.9 ms off), Frankfurt 88.2 vs 91 ms (2.8 ms off).
+  Both are inside the ±3 ms target.
+- **Lifecycle:** the release `netcheck.exe` was closed mid-check (3 s) and
+  after a check (14 s). Both times no `netcheck` process was left running.
+- **Real data:** the release build fetched Valve's live relay list and wrote
+  the history database.
+- **Firewall:** a real run found a block rule scoped to another Windows user
+  (a sandbox account) that Netcheck treated as blocking every region. Rules
+  limited by `LocalUserAuthorizedList` to other users, or to a Store app
+  package, are now ignored. A test covers this case.
+
+Still to check by hand: Launch CS2 with close-after-launch, and unplugging the
+cable on a real network.
 
 ## Screenshots
 

@@ -480,6 +480,7 @@ mod tests {
             protocol: 256,
             application: String::new(),
             remote: parse_remote_addresses("192.0.2.10"),
+            other_users_only: false,
         };
         let fw = FirewallSnapshot {
             profiles: ProfileState { domain: true, private: true, public: true, active: PROFILE_PRIVATE },

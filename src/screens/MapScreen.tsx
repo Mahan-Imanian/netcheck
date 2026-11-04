@@ -30,7 +30,7 @@ export function MapScreen() {
   const color = TONES[resultTone(r)].color;
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-[1fr_272px] gap-3 p-3">
+    <div className="grid h-full min-h-0 grid-cols-[1fr_272px] gap-3 px-4 pt-1 pb-3">
       <section className="panel relative min-h-0 overflow-hidden" aria-label="World map">
         <div className="grid-texture pointer-events-none absolute inset-0" aria-hidden />
         <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(60% 70% at 50% 40%, var(--nc-wash-1), transparent 70%)" }} aria-hidden />

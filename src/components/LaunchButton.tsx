@@ -42,7 +42,7 @@ export function LaunchButton({ disabled }: { disabled?: boolean }) {
   };
 
   const label =
-    stage === "launching" ? "Opening Steam…" : stage === "launched" ? (settings?.closeAfterLaunch ? "Starting CS2 — closing Netcheck" : "CS2 is starting") : "Launch CS2";
+    stage === "launching" ? "Opening Steam…" : stage === "launched" ? (settings?.closeAfterLaunch ? "Starting CS2, closing Netcheck" : "CS2 is starting") : "Launch CS2";
 
   return (
     <div className="relative">
@@ -53,15 +53,18 @@ export function LaunchButton({ disabled }: { disabled?: boolean }) {
         whileHover={{ y: -1 }}
         whileTap={{ scale: 0.975, y: 0 }}
         transition={{ type: "spring", stiffness: 600, damping: 30 }}
-        className="group relative flex h-12 w-full items-center justify-center gap-2.5 overflow-hidden rounded-md text-[14.5px] font-semibold tracking-[-0.005em] text-accent-ink disabled:opacity-60"
+        className="group relative flex h-[52px] w-full items-center justify-center gap-2.5 overflow-hidden rounded-full text-[15px] font-semibold tracking-[-0.01em] text-accent-ink disabled:opacity-55 disabled:saturate-50"
         style={{
-          background: "linear-gradient(180deg, color-mix(in srgb, var(--nc-accent) 92%, white), var(--nc-accent) 55%, color-mix(in srgb, var(--nc-accent) 80%, var(--nc-accent-2)))",
-          boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.45), 0 0 0 1px color-mix(in srgb, var(--nc-accent) 60%, black), 0 8px 28px -8px color-mix(in srgb, var(--nc-accent) calc(var(--nc-glow) * 100%), transparent)",
+          background: "linear-gradient(100deg, var(--nc-accent) 0%, color-mix(in srgb, var(--nc-accent) 45%, var(--nc-accent-2)) 60%, var(--nc-accent-2) 100%)",
+          boxShadow:
+            "inset 0 1px 0 rgb(255 255 255 / 0.5), inset 0 -1px 0 rgb(0 0 0 / 0.15), 0 14px 36px -12px color-mix(in srgb, var(--nc-accent) calc(var(--nc-glow) * 110%), transparent), 0 6px 24px -10px color-mix(in srgb, var(--nc-accent-2) calc(var(--nc-glow) * 90%), transparent)",
         }}
       >
-        <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" aria-hidden />
-        <Play size={16} strokeWidth={2.5} fill="currentColor" aria-hidden />
-        {label}
+        {!disabled && <span className="sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/35 to-transparent" aria-hidden />}
+        <span className="relative grid size-7 place-items-center rounded-full bg-black/15 transition-transform duration-300 group-hover:scale-110">
+          <Play size={13} strokeWidth={2.5} fill="currentColor" className="translate-x-px" aria-hidden />
+        </span>
+        <span className="relative">{label}</span>
       </motion.button>
       {stage === "error" && <p className="mt-2 text-[12px] text-bad">Couldn't open Steam: {error}</p>}
 
@@ -85,14 +88,14 @@ export function LaunchButton({ disabled }: { disabled?: boolean }) {
                 ref={closeBtn}
                 type="button"
                 onClick={() => void answer(true)}
-                className="h-8 flex-1 rounded-sm bg-accent text-[12.5px] font-semibold text-accent-ink transition-[filter] duration-150 hover:brightness-110 active:brightness-95"
+                className="h-8 flex-1 rounded-full bg-accent text-[12.5px] font-semibold text-accent-ink transition-[filter] duration-150 hover:brightness-110 active:brightness-95"
               >
                 Close it
               </button>
               <button
                 type="button"
                 onClick={() => void answer(false)}
-                className="h-8 flex-1 rounded-sm border border-line-2 text-[12.5px] font-medium text-text transition-colors duration-150 hover:bg-s4"
+                className="h-8 flex-1 rounded-full border border-line-2 text-[12.5px] font-medium text-text transition-colors duration-150 hover:bg-s4"
               >
                 Keep it open
               </button>
