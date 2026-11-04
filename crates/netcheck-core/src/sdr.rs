@@ -119,7 +119,7 @@ pub fn parse(body: &str) -> Result<(Vec<Pop>, Option<u64>), SdrError> {
         Ok(w) => w.response,
         Err(_) => serde_json::from_str(body)?,
     };
-    let pops: Vec<Pop> = raw
+    let mut pops: Vec<Pop> = raw
         .pops
         .into_iter()
         .filter_map(|(code, p)| {
@@ -146,6 +146,12 @@ pub fn parse(body: &str) -> Result<(Vec<Pop>, Option<u64>), SdrError> {
             Some(Pop { city: city_of(&p.desc, &code), desc: p.desc, code, lon_lat, relays })
         })
         .collect();
+    let sister: BTreeMap<String, (f64, f64)> = pops.iter().filter_map(|p| p.lon_lat.map(|g| (p.code.clone(), g))).collect();
+    for p in &mut pops {
+        if let Some(g) = p.code.strip_prefix('d').and_then(|stem| sister.get(stem)) {
+            p.lon_lat = Some(*g);
+        }
+    }
     if pops.is_empty() {
         return Err(SdrError::Empty);
     }
@@ -239,6 +245,15 @@ mod tests {
             "v6": { "desc": "Nowhere", "relays": [ { "ipv6": "2001:db8::1" } ] }
         }
     }"#;
+
+    #[test]
+    fn datapacket_pops_take_their_sister_city_coordinates() {
+        let body = r#"{"response":{"pops":{"fra":{"desc":"Frankfurt (Germany)","geo":[8.68,50.12],"relays":[{"ipv4":"192.0.2.1"}]},"dfra":{"desc":"Datapacket Frankfurt (Germany)","geo":[50.11,8.68],"relays":[{"ipv4":"192.0.2.2"}]},"dxb":{"desc":"Dubai","geo":[55.3,25.2],"relays":[{"ipv4":"192.0.2.3"}]}}}}"#;
+        let (pops, _) = parse(body).expect("parse");
+        let geo = |c: &str| pops.iter().find(|p| p.code == c).and_then(|p| p.lon_lat);
+        assert_eq!(geo("dfra"), Some((8.68, 50.12)));
+        assert_eq!(geo("dxb"), Some((55.3, 25.2)));
+    }
 
     #[test]
     fn parses_pops_and_skips_relayless() {
