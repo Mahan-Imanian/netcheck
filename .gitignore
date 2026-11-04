@@ -5,6 +5,5 @@
 /src-tauri/gen
 /artifacts
 
-.claude/
 scripts/env.ps1
 /*.exe
