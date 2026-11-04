@@ -56,8 +56,10 @@ background updater, and it never needs admin rights.
 | ![The route screen pinpointing a congested international link](docs/screenshots/route.png) | ![The regions table sorted by average ping](docs/screenshots/regions.png) |
 | **History** | **Light theme** |
 | ![The history heatmap of ping by hour](docs/screenshots/history.png) | ![The verdict screen in the light theme](docs/screenshots/light.png) |
+| **Update prompt** | **Settings** |
+| ![The update dialog with the new version and its notes](docs/screenshots/update.png) | ![Settings, including the update check](docs/screenshots/settings.png) |
 
-<sub>The animation above is the real app on a live connection. These four come
+<sub>The animation above is the real app on a live connection. These screenshots come
 from the built-in demo backend, which replays synthetic results and marks every
 screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>
 
@@ -140,6 +142,9 @@ doesn't need them either.
 Press <kbd>R</kbd> to check again. History shows your best and worst hours
 after a few checks.
 
+When a new version is out, Netcheck says so after the first check. Update now
+downloads and installs it, and Later asks again next time you open the app.
+
 ### Settings
 
 | Setting | What it does |
@@ -203,6 +208,15 @@ firewall rules, routes or system settings.
 Long links add latency because of distance alone. Netcheck learns each hop's
 usual latency from your history and only reports rises above that, and only
 when your region is slow.
+</details>
+
+<details>
+<summary><b>Does it update itself?</b></summary>
+
+No. It checks GitHub for a newer release when it opens and asks you. Nothing
+is downloaded until you choose Update now, and you can turn the check off in
+Settings. The download is checked against the SHA-256 that GitHub publishes
+for it before it runs.
 </details>
 
 <details>

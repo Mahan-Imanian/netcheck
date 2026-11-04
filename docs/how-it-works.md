@@ -266,6 +266,8 @@ Every state below comes from the demo backend, which is why each one shows a
 | A block rule that does nothing while the firewall is off | Offline |
 | ![The smallest window size](screenshots/small-verdict.png) | ![A 1920 by 1080 window](screenshots/big-verdict.png) |
 | Smallest window, 960 × 620 | 1920 × 1080 |
+| ![The update dialog](screenshots/update.png) | ![Settings](screenshots/settings.png) |
+| A newer release is out | Settings, including the update check |
 
 ## Building installers and signing
 
