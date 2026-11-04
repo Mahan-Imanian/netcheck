@@ -1,0 +1,239 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --nc-bg: #0a0d14;
+  --nc-s1: #0e121b;
+  --nc-s2: #121722;
+  --nc-s3: #181e2b;
+  --nc-s4: #1f2636;
+  --nc-line: rgb(150 172 214 / 0.085);
+  --nc-line-2: rgb(150 172 214 / 0.16);
+  --nc-hi: rgb(255 255 255 / 0.045);
+  --nc-text: #e9eef7;
+  --nc-text-2: #a4afc3;
+  --nc-text-3: #6c778d;
+  --nc-accent: #3be3f5;
+  --nc-accent-2: #2dd4bf;
+  --nc-accent-ink: #031317;
+  --nc-excellent: #3be3f5;
+  --nc-good: #5ee38f;
+  --nc-playable: #f5b841;
+  --nc-bad: #ff5d62;
+  --nc-blocked: #9a8cf0;
+  --nc-muted: #59647a;
+  --nc-glow: 0.55;
+  --nc-land: rgb(132 152 190 / 0.22);
+  --nc-grid: rgb(120 160 220 / 0.045);
+  --nc-wash-1: rgb(59 227 245 / 0.10);
+  --nc-wash-2: rgb(45 212 191 / 0.05);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --nc-bg: #eef1f6;
+  --nc-s1: #f6f8fb;
+  --nc-s2: #ffffff;
+  --nc-s3: #f1f4f9;
+  --nc-s4: #e6ebf3;
+  --nc-line: rgb(22 34 60 / 0.09);
+  --nc-line-2: rgb(22 34 60 / 0.16);
+  --nc-hi: rgb(255 255 255 / 0.9);
+  --nc-text: #0d1422;
+  --nc-text-2: #45516a;
+  --nc-text-3: #77839b;
+  --nc-accent: #0592b0;
+  --nc-accent-2: #0d9488;
+  --nc-accent-ink: #ffffff;
+  --nc-excellent: #0592b0;
+  --nc-good: #16893f;
+  --nc-playable: #b86a05;
+  --nc-bad: #d42a30;
+  --nc-blocked: #6b58cc;
+  --nc-muted: #8a95aa;
+  --nc-glow: 0.22;
+  --nc-land: rgb(40 60 100 / 0.2);
+  --nc-grid: rgb(20 50 100 / 0.05);
+  --nc-wash-1: rgb(5 146 176 / 0.08);
+  --nc-wash-2: rgb(13 148 136 / 0.05);
+}
+
+@theme inline {
+  --color-bg: var(--nc-bg);
+  --color-s1: var(--nc-s1);
+  --color-s2: var(--nc-s2);
+  --color-s3: var(--nc-s3);
+  --color-s4: var(--nc-s4);
+  --color-line: var(--nc-line);
+  --color-line-2: var(--nc-line-2);
+  --color-text: var(--nc-text);
+  --color-text-2: var(--nc-text-2);
+  --color-text-3: var(--nc-text-3);
+  --color-accent: var(--nc-accent);
+  --color-accent-2: var(--nc-accent-2);
+  --color-accent-ink: var(--nc-accent-ink);
+  --color-excellent: var(--nc-excellent);
+  --color-good: var(--nc-good);
+  --color-playable: var(--nc-playable);
+  --color-bad: var(--nc-bad);
+  --color-blocked: var(--nc-blocked);
+  --color-muted: var(--nc-muted);
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--nc-bg);
+    color: var(--nc-text);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    user-select: none;
+    font-feature-settings: "ss01", "cv11";
+  }
+  button {
+    cursor: default;
+  }
+  :focus-visible {
+    outline: 2px solid var(--nc-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--nc-accent) 30%, transparent);
+  }
+}
+
+@layer components {
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums slashed-zero;
+    font-feature-settings: "tnum", "zero";
+    letter-spacing: -0.01em;
+  }
+  .eyebrow {
+    font-size: 10.5px;
+    font-weight: 560;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--nc-text-3);
+  }
+  .panel {
+    position: relative;
+    background: linear-gradient(180deg, var(--nc-s2), var(--nc-s1));
+    border: 1px solid var(--nc-line);
+    border-radius: var(--radius-lg);
+    box-shadow: inset 0 1px 0 var(--nc-hi);
+  }
+  .well {
+    background: var(--nc-s1);
+    border: 1px solid var(--nc-line);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.18);
+  }
+  .grid-texture {
+    background-image:
+      linear-gradient(var(--nc-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--nc-grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    animation: grid-drift 60s linear infinite;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--nc-line-2) transparent;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--nc-s3) 0%, var(--nc-s4) 40%, var(--nc-s3) 80%);
+    background-size: 300% 100%;
+    animation: shimmer 1.6s var(--ease-out-quint) infinite;
+    border-radius: var(--radius-sm);
+  }
+  .glow-text {
+    text-shadow: 0 0 calc(28px * var(--nc-glow)) color-mix(in srgb, currentColor 55%, transparent);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+@keyframes grid-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 28px 28px;
+  }
+}
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@keyframes ring-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+@keyframes sweep-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes soft-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.arc-flow {
+  stroke-dasharray: 2 10;
+  animation: dash-flow 1.4s linear infinite;
+}
+.live-dot {
+  animation: soft-blink 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .grid-texture,
+  .arc-flow,
+  .live-dot,
+  .skeleton {
+    animation: none !important;
+  }
+}

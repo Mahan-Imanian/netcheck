@@ -1,0 +1,24 @@
+[package]
+name = "netcheck"
+description = "Pre-match connection check for Counter-Strike 2"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "netcheck_lib"
+crate-type = ["rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+netcheck-core = { path = "../crates/netcheck-core" }
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["rt", "sync", "time", "macros"] }
+tokio-util = "0.7"

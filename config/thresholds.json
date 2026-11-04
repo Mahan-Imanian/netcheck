@@ -1,0 +1,6 @@
+{
+  "excellent": { "avgMs": 50, "jitterMs": 4, "lossPct": 0 },
+  "good": { "avgMs": 90, "jitterMs": 10, "lossPct": 2 },
+  "playable": { "avgMs": 150, "jitterMs": 25, "lossPct": 5 },
+  "problemHop": { "jumpMs": 25, "lossPct": 5 }
+}

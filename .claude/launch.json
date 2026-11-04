@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "netcheck-demo",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d D:\\netcheck && set VITE_NETCHECK_DEMO=1&& pnpm exec vite --port 1420 --strictPort --host 127.0.0.1"],
+      "port": 1420
+    }
+  ]
+}
