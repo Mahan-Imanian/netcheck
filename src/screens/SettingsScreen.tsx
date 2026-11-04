@@ -22,7 +22,7 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
 
 function Segmented<T extends string>({ value, options, onChange, label }: { value: T; options: Array<{ value: T; label: string }>; onChange(v: T): void; label: string }) {
   return (
-    <div role="radiogroup" aria-label={label} className="well inline-flex rounded-full p-[3px]">
+    <div role="radiogroup" aria-label={label} className="well inline-flex p-[3px]">
       {options.map((o) => (
         <button
           key={o.value}
@@ -30,10 +30,10 @@ function Segmented<T extends string>({ value, options, onChange, label }: { valu
           role="radio"
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
-          className={`relative h-7 rounded-full px-3.5 text-[12px] font-medium transition-colors duration-150 ${value === o.value ? "text-text" : "text-text-3 hover:text-text-2"}`}
+          className={`display relative h-7 px-3.5 text-[13.5px] font-semibold tracking-[0.08em] uppercase transition-colors duration-150 ${value === o.value ? "text-text" : "text-text-3 hover:text-text-2"}`}
         >
           {value === o.value && (
-            <motion.span layoutId={`seg-${label}`} className="absolute inset-0 rounded-full bg-s4 shadow-[inset_0_1px_0_var(--nc-hi),inset_0_0_0_1px_var(--nc-line-2)]" transition={{ type: "spring", stiffness: 500, damping: 38 }} />
+            <motion.span layoutId={`seg-${label}`} className="absolute inset-0 bg-s4 shadow-[inset_0_1px_0_var(--nc-hi),inset_0_0_0_1px_var(--nc-line-2)]" transition={{ type: "spring", stiffness: 500, damping: 38 }} />
           )}
           <span className="relative">{o.label}</span>
         </button>
@@ -100,7 +100,7 @@ export function SettingsScreen() {
     <div className="flex h-full min-h-0 flex-col px-4 pt-1 pb-3">
       <section className="panel flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="Settings">
         <div className="flex items-center gap-3 border-b border-line px-6 py-3.5">
-          <h2 className="text-[14px] font-semibold">Settings</h2>
+          <h2 className="hud-title">Settings</h2>
           <span className="text-[11.5px] text-text-3">Saved on this PC. Changes apply from the next check.</span>
           <span className="flex-1" />
           {saved && !dirty && (
@@ -113,7 +113,7 @@ export function SettingsScreen() {
             whileTap={{ scale: 0.97 }}
             disabled={!dirty}
             onClick={() => void saveSettings(draft).then(() => setSaved(true))}
-            className="h-8 rounded-full bg-accent px-4 text-[12.5px] font-semibold text-accent-ink transition-[filter,opacity] duration-150 hover:brightness-110 disabled:opacity-40"
+            className="chamfer-sm display h-8 bg-accent px-4 text-[14px] font-bold tracking-[0.08em] text-accent-ink uppercase transition-[filter,opacity] duration-150 hover:brightness-110 disabled:opacity-40"
           >
             Save changes
           </motion.button>

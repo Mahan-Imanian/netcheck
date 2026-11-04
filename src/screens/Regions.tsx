@@ -1,4 +1,4 @@
-import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { PingStats } from "../bindings/PingStats";
@@ -60,7 +60,6 @@ function Distribution({ stats, color }: { stats: PingStats; color: string }) {
 }
 
 function Row({ info, result, best, preferred, open, onToggle }: { info: RegionInfo; result: RegionResult | undefined; best: boolean; preferred: boolean; open: boolean; onToggle(): void }) {
-  const reduce = useReducedMotion();
   const s = result?.stats;
   const tone = resultTone(result);
   const color = TONES[tone].color;
@@ -68,7 +67,7 @@ function Row({ info, result, best, preferred, open, onToggle }: { info: RegionIn
 
   return (
     <motion.li
-      layout={reduce ? false : "position"}
+      layout={"position"}
       transition={{ type: "spring", stiffness: 380, damping: 38 }}
       className={`border-b border-line ${open ? "bg-s2" : ""}`}
     >
@@ -97,7 +96,7 @@ function Row({ info, result, best, preferred, open, onToggle }: { info: RegionIn
         <span className={`num text-right text-[12.5px] ${s && s.lossPct > 0 ? "font-semibold text-bad" : "text-text-2"}`}>
           {result ? `${pct(s?.lossPct ?? 100)}%` : <Skeleton className="ml-auto h-3 w-7" />}
         </span>
-        <span>{result ? <GradePill tone={tone} label={result.status === "NoReply" ? "No reply" : undefined} /> : <Skeleton className="h-[22px] w-[74px] rounded-full" />}</span>
+        <span>{result ? <GradePill quiet tone={tone} label={result.status === "NoReply" ? "No reply" : undefined} /> : <Skeleton className="h-4 w-[74px]" />}</span>
         <span className="flex gap-1">
           {info.block.state === "blocked" && <Tag kind="blocked" />}
           {result?.estimated && info.block.state !== "blocked" && <Tag kind="estimated" />}
@@ -108,9 +107,9 @@ function Row({ info, result, best, preferred, open, onToggle }: { info: RegionIn
       <AnimatePresence initial={false}>
         {open && s && (
           <motion.div
-            initial={reduce ? false : { height: 0, opacity: 0 }}
+            initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
@@ -160,7 +159,7 @@ export function RegionsScreen() {
       )}
       <section className="panel flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="All regions">
         <div className="flex items-center gap-4 px-4 pt-3 pb-2.5">
-          <h2 className="text-[14px] font-semibold tracking-[-0.01em]">All regions</h2>
+          <h2 className="hud-title">All regions</h2>
           <div className="num flex items-center gap-3 text-[11.5px] text-text-3">
             <span>
               <span className="text-text">{list.length}</span> regions

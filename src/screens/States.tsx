@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { CloudOff, Laptop, RotateCw, Router, ShieldAlert, WifiOff, Globe2 } from "lucide-react";
 import { useApp } from "../lib/store";
 
@@ -26,7 +26,7 @@ function ReCheck() {
       type="button"
       whileTap={{ scale: 0.97 }}
       onClick={() => void startCheck()}
-      className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-[13px] font-semibold text-accent-ink shadow-[inset_0_1px_0_rgb(255_255_255/0.4)] transition-[filter] duration-150 hover:brightness-110"
+      className="chamfer display inline-flex h-10 items-center gap-2 bg-accent px-5 text-[15px] font-bold tracking-[0.1em] text-accent-ink uppercase transition-[filter] duration-150 hover:brightness-110"
     >
       <RotateCw size={14} strokeWidth={2.4} /> Re-check
       <kbd className="num rounded-xs border border-black/20 px-1 text-[10px] opacity-70">R</kbd>
@@ -35,7 +35,6 @@ function ReCheck() {
 }
 
 function BrokenChain({ cutAfter }: { cutAfter: number }) {
-  const reduce = useReducedMotion();
   const nodes = [
     { icon: Laptop, label: "This PC" },
     { icon: Router, label: "Router" },
@@ -53,7 +52,7 @@ function BrokenChain({ cutAfter }: { cutAfter: number }) {
                 <div className={`border-t-2 ${dead ? "border-dashed border-line-2" : "border-accent/70"}`} />
                 {i === cutAfter + 1 && (
                   <motion.span
-                    initial={reduce ? false : { scale: 0.6, opacity: 0 }}
+                    initial={{ scale: 0.6, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="absolute top-1/2 left-1/2 grid size-6 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-bg text-bad ring-1 ring-bad/50"
                     style={{ boxShadow: "0 0 18px color-mix(in srgb, var(--nc-bad) 50%, transparent)" }}
@@ -64,7 +63,7 @@ function BrokenChain({ cutAfter }: { cutAfter: number }) {
               </div>
             )}
             <div className="flex w-16 flex-col items-center gap-1.5">
-              <span className={`grid size-11 place-items-center rounded-full border ${dead ? "border-dashed border-line-2 text-text-3" : "border-accent/40 bg-accent/10 text-accent"}`}>
+              <span className={`grid size-11 place-items-center border ${dead ? "border-dashed border-line-2 text-text-3" : "border-accent/40 bg-accent/10 text-accent"}`}>
                 <Icon size={18} strokeWidth={1.9} />
               </span>
               <span className={`text-[11.5px] ${dead ? "text-text-3" : "text-text-2"}`}>{n.label}</span>
@@ -89,7 +88,7 @@ export function OfflineScreen() {
         <div className="relative">
           <div className="flex items-center gap-2 text-bad">
             <WifiOff size={16} strokeWidth={2.2} />
-            <span className="text-[12px] font-semibold tracking-[0.11em] uppercase">No connection</span>
+            <span className="hud-label text-current">No connection</span>
           </div>
           <h1 className="mt-3 text-[30px] leading-tight font-semibold tracking-[-0.025em]">You're offline</h1>
           <p className="mt-2 max-w-[460px] text-[14px] text-text-2">
@@ -123,7 +122,7 @@ export function NoRelayListScreen({ message }: { message: string }) {
         <div className="relative">
           <div className="flex items-center gap-2 text-playable">
             <CloudOff size={16} strokeWidth={2.2} />
-            <span className="text-[12px] font-semibold tracking-[0.11em] uppercase">Valve API unreachable</span>
+            <span className="hud-label text-current">Valve API unreachable</span>
           </div>
           <h1 className="mt-3 text-[30px] leading-tight font-semibold tracking-[-0.025em]">Can't get Valve's relay list</h1>
           <p className="mt-2 max-w-[480px] text-[14px] text-text-2">

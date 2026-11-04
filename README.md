@@ -210,7 +210,12 @@ cable on a real network.
 
 ## Screenshots
 
-These come from the demo backend (synthetic data, marked DEV DEMO DATA).
+The release build on Windows 11, with a live connection:
+
+![Netcheck on Windows](docs/screenshots/real-windows.png)
+
+These come from the demo backend (synthetic data, marked DEV DEMO DATA). Run
+`pnpm dev:demo` and `scripts/screenshots.ps1` to regenerate them.
 
 | | |
 |---|---|

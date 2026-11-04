@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { Globe2, Laptop, Router, Server, Building2, type LucideIcon } from "lucide-react";
 import { Fragment } from "react";
 import type { Hop } from "../bindings/Hop";
@@ -80,34 +80,33 @@ function fullNodes(route: RouteResult): Node[] {
 }
 
 function NodeView({ node, compact, index }: { node: Node; compact: boolean; index: number }) {
-  const reduce = useReducedMotion();
   const Icon = node.icon;
   const tone = node.problem ? "var(--nc-bad)" : node.silent ? "var(--nc-text-3)" : node.segment === "You" ? "var(--nc-text)" : "var(--nc-accent)";
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: reduce ? 0 : index * 0.035, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      className={`flex shrink-0 flex-col items-center text-center ${compact ? "w-[68px]" : "w-[104px]"}`}
+      transition={{ delay: index * 0.035, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      className={`flex flex-col items-center text-center ${compact ? "w-[76px] shrink-0" : "min-w-[78px] flex-[0_1_104px]"}`}
     >
       <div
-        className={`relative grid place-items-center rounded-full border ${compact ? "size-9" : "size-11"} ${node.silent ? "border-dashed" : ""}`}
+        className={`relative grid place-items-center border ${compact ? "size-9" : "size-11"} ${node.silent ? "border-dashed" : ""}`}
         style={{
           borderColor: `color-mix(in srgb, ${tone} 45%, transparent)`,
           background: `color-mix(in srgb, ${tone} 9%, var(--nc-s2))`,
           boxShadow: node.problem ? "0 0 22px color-mix(in srgb, var(--nc-bad) 55%, transparent)" : undefined,
         }}
       >
-        {node.problem && !reduce && (
-          <span className="absolute inset-0 rounded-full border border-bad" style={{ animation: "ring-pulse 1.8s var(--ease-out-quint) infinite" }} />
+        {node.problem && (
+          <span className="absolute inset-0 border border-bad" style={{ animation: "ring-pulse 1.8s var(--ease-out-quint) infinite" }} />
         )}
         <Icon size={compact ? 15 : 17} strokeWidth={1.9} style={{ color: tone }} aria-hidden />
       </div>
-      <div className={`num mt-1.5 leading-none font-semibold ${compact ? "text-[13px]" : "text-[15px]"}`} style={{ color: node.problem ? "var(--nc-bad)" : undefined }}>
+      <div className={`display mt-1.5 leading-none font-bold ${compact ? "text-[17px]" : "text-[19px]"}`} style={{ color: node.problem ? "var(--nc-bad)" : undefined }}>
         {node.silent ? "—" : `${ms(node.avg)}`}
-        {!node.silent && <span className="ml-0.5 text-[10px] font-normal text-text-3">ms</span>}
+        {!node.silent && <span className="ml-0.5 text-[11px] font-semibold tracking-[0.06em] text-text-3">MS</span>}
       </div>
-      <div className={`mt-1 max-w-full truncate ${compact ? "text-[11px] text-text-2" : "num text-[10.5px] text-text-2"}`} title={node.label}>
+      <div className={`mt-1 max-w-full truncate ${compact ? "display text-[12.5px] font-semibold tracking-[0.03em] text-text-3 uppercase" : "num text-[10.5px] text-text-2"}`} title={node.label}>
         {node.label}
       </div>
       {!compact && (
@@ -121,13 +120,12 @@ function NodeView({ node, compact, index }: { node: Node; compact: boolean; inde
 }
 
 function Link({ from, to, compact }: { from: Node; to: Node; compact: boolean }) {
-  const reduce = useReducedMotion();
   const delta = from.avg != null && to.avg != null ? to.avg - from.avg : null;
   const { color, width } = severity(delta, to.problem);
   return (
-    <div className={`relative flex flex-1 flex-col items-center justify-start ${compact ? "min-w-5 pt-[17px]" : "min-w-10 pt-[21px]"}`}>
+    <div className={`relative flex flex-1 flex-col items-center justify-start ${compact ? "min-w-5 pt-[17px]" : "min-w-3 pt-[21px]"}`}>
       <motion.div
-        className="w-full origin-left rounded-full"
+        className="w-full origin-left"
         style={{
           height: width,
           marginTop: -width / 2,
@@ -135,7 +133,7 @@ function Link({ from, to, compact }: { from: Node; to: Node; compact: boolean })
           boxShadow: to.problem ? "0 0 12px var(--nc-bad)" : `0 0 8px -2px ${color}`,
           opacity: to.problem ? 1 : 0.55,
         }}
-        initial={reduce ? false : { scaleX: 0 }}
+        initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       />
@@ -177,7 +175,7 @@ export function RouteChainSkeleton({ compact = false }: { compact?: boolean }) {
             </div>
           )}
           <div className={`flex shrink-0 flex-col items-center gap-1.5 ${compact ? "w-[68px]" : "w-[104px]"}`}>
-            <div className={`skeleton rounded-full ${compact ? "size-9" : "size-11"}`} />
+            <div className={`skeleton ${compact ? "size-9" : "size-11"}`} />
             <div className="skeleton h-3 w-8" />
             <div className="skeleton h-2.5 w-12" />
           </div>

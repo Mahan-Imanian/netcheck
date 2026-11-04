@@ -13,7 +13,7 @@ function Profile({ label, on, active }: { label: string; on: boolean; active: bo
       className={`inline-flex items-center gap-1 ${active ? "text-text-2" : "text-text-3"}`}
       title={`${label} profile: firewall ${on ? "on" : "off"}${active ? " (current network)" : ""}`}
     >
-      <span className={`size-1.5 rounded-full ${on ? "bg-good" : "bg-bad"}`} />
+      <span className={`size-1.5 ${on ? "bg-good" : "bg-bad"}`} />
       <span className={active ? "underline decoration-line-2 underline-offset-[3px]" : ""}>{label}</span>
     </span>
   );
@@ -75,7 +75,7 @@ export function StatusBar() {
       </span>
       <span className="flex-1" />
       {demo && (
-        <span className="inline-flex items-center gap-1 rounded-full bg-playable/15 px-2 py-px font-semibold text-playable">
+        <span className="chamfer-sm display inline-flex items-center gap-1 bg-playable/15 px-2 py-px text-[12px] font-bold tracking-[0.08em] text-playable uppercase">
           <FlaskConical size={11} /> Dev demo data
         </span>
       )}

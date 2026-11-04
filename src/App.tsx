@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, MotionConfig, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
 import { StatusBar } from "./components/StatusBar";
 import { TitleBar } from "./components/TitleBar";
@@ -71,7 +71,6 @@ function useShortcuts() {
 }
 
 function Content() {
-  const reduce = useReducedMotion();
   const tab = useApp((s) => s.tab);
   const failure = useApp((s) => s.failure);
   const offline = useApp((s) => s.offline);
@@ -94,7 +93,7 @@ function Content() {
       <motion.main
         key={key}
         className="min-h-0 flex-1"
-        initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
@@ -110,9 +109,8 @@ export function App() {
   useTheme();
   useShortcuts();
   return (
-    <MotionConfig reducedMotion="user">
       <div className="relative flex h-full flex-col overflow-hidden bg-bg">
-        <div className="aurora" aria-hidden />
+        <div className="vignette" aria-hidden />
         <div className="grain" aria-hidden />
         <div className="relative z-10 flex min-h-0 flex-1 flex-col">
           <TitleBar />
@@ -120,6 +118,5 @@ export function App() {
           <StatusBar />
         </div>
       </div>
-    </MotionConfig>
   );
 }
