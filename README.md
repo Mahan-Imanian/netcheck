@@ -270,12 +270,6 @@ Please report vulnerabilities privately through
 [GitHub security advisories](https://github.com/Mahan-Imanian/netcheck/security/advisories/new),
 not as public issues. See [SECURITY.md](SECURITY.md).
 
-## Code signing policy
-
-Netcheck is preparing an application to the SignPath Foundation for free Authenticode code signing. The project has not yet been approved, and no signing certificate has been issued. Until signing is enabled, Windows installers remain unsigned.
-
-If accepted, release signing will be performed through SignPath's GitHub Actions integration. Only release artifacts built from tagged source in this repository may be submitted for signing. Each signed installer must have its Authenticode signature verified before publication. Signing credentials and private keys must never be committed to this repository.
-
 ## License and acknowledgements
 
 Netcheck is released under the [MIT License](LICENSE).
