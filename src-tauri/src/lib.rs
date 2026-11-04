@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+use std::process::Command;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -8,6 +10,7 @@ use netcheck_core::netinfo;
 use netcheck_core::sdr::{SdrClient, SdrError};
 use netcheck_core::settings::Settings;
 use netcheck_core::store::{HistoryCell, Store, StoreError};
+use netcheck_core::update::{self, InstallKind, UpdateClient, UpdateError, UpdateInfo};
 use serde::Serialize;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager, RunEvent, State, WindowEvent};
@@ -27,6 +30,10 @@ enum AppError {
     Launch(String),
     #[error("could not prepare app data folder: {0}")]
     Setup(String),
+    #[error(transparent)]
+    Update(#[from] UpdateError),
+    #[error("could not start the installer: {0}")]
+    Install(String),
 }
 
 impl Serialize for AppError {
@@ -41,6 +48,8 @@ struct AppState {
     prober: SharedProber,
     root: CancellationToken,
     current: Mutex<Option<CancellationToken>>,
+    updates: Arc<UpdateClient>,
+    pending: Mutex<Option<UpdateInfo>>,
 }
 
 fn now_ms() -> i64 {
@@ -150,6 +159,53 @@ fn launch_cs2(app: AppHandle) -> Result<(), AppError> {
     app.opener().open_url(CS2_URL, None::<&str>).map_err(|e| AppError::Launch(e.to_string()))
 }
 
+fn this_install() -> InstallKind {
+    let roots: Vec<PathBuf> =
+        ["ProgramFiles", "ProgramW6432", "ProgramFiles(x86)"].iter().filter_map(std::env::var_os).map(PathBuf::from).collect();
+    std::env::current_exe().map_or(InstallKind::Portable, |exe| update::install_kind(&exe, &roots))
+}
+
+#[tauri::command]
+async fn check_update(app: AppHandle, state: State<'_, AppState>) -> Result<Option<UpdateInfo>, AppError> {
+    if !state.store.load_settings()?.check_updates {
+        return Ok(None);
+    }
+    let current = app.package_info().version.to_string();
+    let found = state.updates.check(&current, this_install()).await?;
+    if let Ok(mut pending) = state.pending.lock() {
+        pending.clone_from(&found);
+    }
+    Ok(found)
+}
+
+#[tauri::command]
+async fn install_update(app: AppHandle, state: State<'_, AppState>, on_progress: Channel<(u64, u64)>) -> Result<(), AppError> {
+    let installer = state.pending.lock().ok().and_then(|p| p.as_ref().and_then(|u| u.installer.clone())).ok_or(UpdateError::NoInstaller)?;
+    let dir = std::env::temp_dir().join("netcheck-update");
+    let path = state
+        .updates
+        .download(&installer, &dir, |done, total| {
+            let _ = on_progress.send((done, total));
+        })
+        .await?;
+    let child = if installer.name.ends_with(".msi") {
+        Command::new("msiexec").arg("/i").arg(&path).arg("/passive").spawn()
+    } else {
+        Command::new(&path).args(["/P", "/R", "/UPDATE"]).spawn()
+    };
+    child.map_err(|e| AppError::Install(e.to_string()))?;
+    shutdown(&app);
+    app.exit(0);
+    Ok(())
+}
+
+#[tauri::command]
+fn open_release_page(app: AppHandle, state: State<'_, AppState>) -> Result<(), AppError> {
+    let url =
+        state.pending.lock().ok().and_then(|p| p.as_ref().map(|u| u.page_url.clone())).unwrap_or_else(|| update::RELEASES_PAGE.to_string());
+    app.opener().open_url(url, None::<&str>).map_err(|e| AppError::Launch(e.to_string()))
+}
+
 #[tauri::command]
 fn quit(app: AppHandle) {
     shutdown(&app);
@@ -176,6 +232,8 @@ fn setup_state(app: &AppHandle) -> Result<AppState, AppError> {
         prober: Arc::new(SystemProber),
         root: CancellationToken::new(),
         current: Mutex::new(None),
+        updates: Arc::new(UpdateClient::new()?),
+        pending: Mutex::new(None),
     })
 }
 
@@ -205,7 +263,18 @@ pub fn run() {
                 shutdown(window.app_handle());
             }
         })
-        .invoke_handler(tauri::generate_handler![get_settings, save_settings, history, run_check, cancel_check, launch_cs2, quit])
+        .invoke_handler(tauri::generate_handler![
+            get_settings,
+            save_settings,
+            history,
+            run_check,
+            cancel_check,
+            launch_cs2,
+            check_update,
+            install_update,
+            open_release_page,
+            quit
+        ])
         .build(tauri::generate_context!());
 
     match app {

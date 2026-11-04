@@ -19,6 +19,7 @@ import type { RouteResult } from "../bindings/RouteResult";
 import type { Segment } from "../bindings/Segment";
 import type { Settings } from "../bindings/Settings";
 import type { Thresholds } from "../bindings/Thresholds";
+import type { UpdateInfo } from "../bindings/UpdateInfo";
 import defaults from "../../config/thresholds.json";
 
 type Scenario = "normal" | "unstable" | "congested" | "wifi" | "offline" | "blocked" | "allblocked" | "firewalloff" | "cache" | "norelays" | "longroute";
@@ -238,8 +239,23 @@ export function createDemoBackend(params: URLSearchParams): Backend {
     closeAfterLaunch: null,
     theme: (params.get("theme") as Settings["theme"] | null) ?? "dark",
     homeLonLat: null,
+    checkUpdates: true,
   };
   let run = 0;
+  const updateMode = params.get("update");
+  const update: UpdateInfo | null = updateMode
+    ? {
+        version: "0.3.0",
+        current: "0.2.1",
+        notes: "## Added\n\n- Netcheck tells you when a new version is out and can install it for you.\n- A portable build that runs without installing.\n\n## Changed\n\n- Updated the windows, reqwest, rusqlite and ts-rs crates.",
+        pageUrl: "https://github.com/Mahan-Imanian/netcheck/releases",
+        publishedAt: new Date().toISOString(),
+        installer:
+          updateMode === "portable"
+            ? null
+            : { name: "Netcheck_0.3.0_x64-setup.exe", url: "https://github.com/Mahan-Imanian/netcheck/releases", size: 4_300_000, sha256: "0".repeat(64) },
+      }
+    : null;
 
   const runCheck = async (emit: (e: CheckEvent) => void) => {
     const id = ++run;
@@ -343,6 +359,25 @@ export function createDemoBackend(params: URLSearchParams): Backend {
     },
     history: async () => demoHistory(scenario),
     launchCs2: async () => wait(500),
+    checkUpdate: async () => {
+      await wait(400);
+      return settings.checkUpdates ? update : null;
+    },
+    installUpdate: async (onProgress) => {
+      const total = update?.installer?.size ?? 0;
+      if (updateMode === "fail") {
+        await wait(900);
+        throw "the download doesn't match the release checksum";
+      }
+      for (let done = 0; done < total; done += 180_000) {
+        await wait(60 / speed);
+        onProgress(done, total);
+      }
+      onProgress(total, total);
+      await wait(800);
+      document.body.dataset.demoQuit = "1";
+    },
+    openReleasePage: async () => {},
     quit: async () => {
       document.body.dataset.demoQuit = "1";
     },

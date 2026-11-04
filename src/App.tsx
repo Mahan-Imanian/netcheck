@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
 import { StatusBar } from "./components/StatusBar";
 import { TitleBar } from "./components/TitleBar";
+import { UpdateDialog } from "./components/UpdateDialog";
 import { loadBackend } from "./lib/backend";
 import { useApp, type Tab } from "./lib/store";
 import { HistoryScreen } from "./screens/HistoryScreen";
@@ -118,6 +119,7 @@ export function App() {
           <Content />
           <StatusBar />
         </div>
+        <UpdateDialog />
       </div>
   );
 }

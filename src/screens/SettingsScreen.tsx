@@ -217,6 +217,17 @@ export function SettingsScreen() {
               ]}
             />
           </Row>
+          <Row label="Updates" hint="Asks GitHub for the latest release when Netcheck opens. Nothing is downloaded until you choose to update.">
+            <Segmented
+              label="updates"
+              value={draft.checkUpdates ? "on" : "off"}
+              onChange={(v) => set({ checkUpdates: v === "on" })}
+              options={[
+                { value: "on", label: "Check on startup" },
+                { value: "off", label: "Don't check" },
+              ]}
+            />
+          </Row>
           <Row label="Map origin" hint="Where arcs on the map start. Auto uses the location of your lowest-ping region.">
             <div className="flex items-center gap-3">
               <Segmented
