@@ -7,6 +7,16 @@ versions may change behavior and settings.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-04
+
+### Changed
+
+- The gauge now shows your fastest region by default, ranked by ping, jitter
+  and loss, and the route is traced to it. Pick a region in Settings to pin it
+  instead. If you saved settings in 0.1.0, your region stays pinned to what it
+  was; choose "Fastest region (automatic)" to switch.
+- Rewrote the README in plainer language.
+
 ## [0.1.0] - 2026-11-04
 
 The first public release.
@@ -40,5 +50,6 @@ The first public release.
 - Netcheck never needs administrator rights, never changes system settings, and
   never reads or touches game files.
 
-[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.0
 [0.1.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.1.0

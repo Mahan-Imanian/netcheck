@@ -5,11 +5,9 @@
   <img alt="Netcheck" src="docs/assets/wordmark-light.png" width="380">
 </picture>
 
-### Know your Counter-Strike 2 connection before you queue.
-
-Netcheck pings every Valve server region, measures jitter and packet loss, and
-traces your route to show whether a bad night is your Wi-Fi, your ISP, the
-international link, or Valve. Then it launches the game.
+Netcheck is a Windows app for Counter-Strike 2 players. It pings every Valve
+server region, measures jitter and packet loss, and traces the route to the
+fastest one. Run it before you queue.
 
 [![CI](https://github.com/Mahan-Imanian/netcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Mahan-Imanian/netcheck/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/Mahan-Imanian/netcheck?include_prereleases&label=release&color=33d6a3)](https://github.com/Mahan-Imanian/netcheck/releases)
@@ -21,45 +19,35 @@ international link, or Valve. Then it launches the game.
 [Contributing](CONTRIBUTING.md) ·
 [Changelog](CHANGELOG.md)
 
-<img src="docs/assets/demo.gif" alt="Netcheck running a check on a live connection: the gauge fills, regions arrive on the map, and the verdict appears" width="900">
+<img src="docs/assets/demo.gif" alt="Netcheck running a check: the gauge fills, regions appear on the map, and the result shows" width="900">
 
-<sub>Recorded from the release build on a live connection, at real speed.</sub>
+<sub>The release build on a live connection, at real speed.</sub>
 
 </div>
 
-## Why Netcheck
+## What it does
 
-Your ping to a CS2 region isn't fixed. It changes with the time of day, your
-ISP's international links, and Wi-Fi interference. You usually find out
-mid-match, from rubber-banding and lost duels.
+Ping to a CS2 region changes during the day. Wi-Fi, your ISP and the
+international links on your route all add to it. Netcheck shows the numbers
+before a match starts. It doesn't block servers or change settings.
 
-Region pickers like Steam Route Tool block servers. Netcheck answers the
-question before that: **how is my connection right now, and whose fault is
-it?** It doesn't change anything on your PC. It measures, explains, and gets
-out of the way.
+- Pings each Valve region 20 times, using the relay list from Valve's API.
+  For each region it shows average, worst 5%, jitter and packet loss. A full
+  check takes about 10 seconds.
+- Puts the fastest region in the big gauge. You can pin a region instead
+  in Settings.
+- Grades each region Excellent, Good, Playable or Bad. You can change the
+  thresholds.
+- Traces the route to that region and groups the hops into router, ISP,
+  international link and Valve. If the region is slow, it names the first hop
+  where latency or loss jumps.
+- Reads your Windows Firewall rules. Regions you've blocked show as blocked,
+  with an estimated ping.
+- Keeps 14 days of history and shows your best and worst hours.
+- Launches CS2 through Steam.
 
-## Features
-
-- **Every Valve region in about 10 seconds.** Netcheck pings every region,
-  using the relay list straight from Valve's API, and reports average,
-  worst-5%, jitter and packet loss for each.
-- **A verdict you can act on.** "Vienna is unstable right now. Frankfurt is
-  5 ms behind and clean." Grades from Excellent to Bad use thresholds you can
-  change.
-- **Finds the broken hop.** A parallel traceroute groups hops into router, ISP,
-  international link and Valve, and names the first one where latency or loss
-  really breaks. It learns each hop's normal latency, so plain distance isn't
-  mistaken for congestion.
-- **Understands your firewall.** If you block regions with Windows Firewall
-  rules, Netcheck labels those regions as blocked instead of dead, estimates
-  their ping, and warns when a rule does nothing because the firewall is off.
-- **History.** A 14-day, hour-by-hour heatmap shows when your preferred region
-  is reliably good, plus your best and worst hours.
-- **One click to play.** Launch CS2 through Steam, and optionally close
-  Netcheck on the way out.
-- **Light on your system.** It only runs while its window is open: no tray
-  icon, service, autostart or updater. It never needs admin rights and never
-  touches the game.
+It only runs while its window is open. There's no tray icon, service or
+updater, and it never needs admin rights.
 
 ## Screenshots
 
@@ -126,34 +114,33 @@ doesn't need them either.
 
 ### Known limitations
 
-- **Tested on Windows 11 only.** Windows 10 is expected to work, but hasn't been
-  tested.
-- **Launch CS2** opens `steam://rungameid/730`, the same link a desktop
+- Tested on Windows 11 only. Windows 10 should work but hasn't been tested.
+- Launch CS2 opens `steam://rungameid/730`, the same link a desktop
   shortcut uses, so Steam needs to be installed. Launching the game, and the
   "close Netcheck after launching" option, haven't been tested end to end yet.
-- **Some VPNs and firewalls drop ICMP.** Regions then show "no reply", even
+- Some VPNs and firewalls drop ICMP. Regions then show "no reply", even
   though the game itself may connect fine.
-- **IPv4 only**, matching the relay addresses Valve publishes.
+- IPv4 only, like the relay addresses Valve publishes.
 
 ## Using it
 
-1. **Open Netcheck.** The check starts on its own and takes about 10 seconds.
-2. **Read the verdict.** The big number is your preferred region (Vienna by
-   default; change it in Settings). The line under the gauge says whether it's
-   good to play, and suggests a cleaner region if one exists.
-3. **If it's bad, open Route.** It shows which section of the path is at fault.
-   Your router or Wi-Fi is something you can fix. Congestion on the
-   international link usually clears up off-peak.
-4. **Press Launch CS2.**
+1. Open Netcheck. The check starts on its own and takes about 10 seconds.
+2. The big number is your fastest region, or the one you pinned in Settings.
+   The line under the gauge says whether it's good to play, and names a
+   cleaner region if there is one.
+3. If it's bad, open Route to see which part of the path is slow. A slow
+   router or Wi-Fi is on your side. A slow international link is usually your
+   ISP at peak hours.
+4. Press Launch CS2.
 
-Press <kbd>R</kbd> at any time to check again. **History** shows your best and
-worst hours once you've run a few checks.
+Press <kbd>R</kbd> to check again. History shows your best and worst hours
+after a few checks.
 
 ### Settings
 
 | Setting | What it does |
 |---|---|
-| Your region | The region the gauge, route trace and history follow. |
+| Your region | Fastest region (the default), or a region you pick. The gauge, route trace and history follow it. |
 | Pings per region | 10 to 100, sent 100 ms apart. More pings give steadier numbers and take longer. |
 | Grade thresholds | Average, jitter and loss limits for each grade. Defaults live in [`config/thresholds.json`](config/thresholds.json). |
 | After launching CS2 | Close Netcheck, keep it open, or ask each time. |
@@ -166,24 +153,24 @@ worst hours once you've run a few checks.
 flowchart LR
     A[Valve relay list<br/>GetSDRConfig] --> B[Ping every region<br/>20 echoes each]
     B --> C[Grade<br/>avg, jitter, loss]
-    D[Traceroute to<br/>your region] --> E[Find the first hop<br/>that really breaks]
+    D[Traceroute to<br/>your region] --> E[First hop where<br/>latency or loss jumps]
     F[Windows Firewall<br/>read-only] --> C
     C --> G((Verdict))
     E --> G
 ```
 
 Netcheck sends ICMP echoes through the Windows `IcmpSendEcho2` API, the same
-path `ping.exe` uses. On Windows 11 its averages landed within 3 ms of
-`ping -n 20` against the same live Valve relays. The diagnosis only blames a
-hop when your region is actually degraded, ignores routers that are just slow
-to answer pings themselves, and subtracts each hop's normal latency.
+path `ping.exe` uses. On Windows 11 its averages were within 3 ms of
+`ping -n 20` against the same Valve relays. A hop is only blamed when your
+region is slow, the slowdown carries on to every later hop, and it's above that
+hop's usual latency.
 
-**Network use:** Valve's public relay list, ICMP echoes to relays, your router,
-1.1.1.1 and the hops on your route, and nothing else. No telemetry, no
-accounts, no update checks.
+Netcheck downloads Valve's public relay list and sends ICMP echoes to the
+relays, your router, 1.1.1.1 and the hops on your route. It makes no other
+network requests: no telemetry, accounts or update checks.
 
-The full details, with the exact rules, files on disk and architecture, are in
-[**docs/how-it-works.md**](docs/how-it-works.md).
+The exact rules, the files it writes and the architecture are in
+[docs/how-it-works.md](docs/how-it-works.md).
 
 ## FAQ
 
@@ -207,17 +194,16 @@ firewall rules, routes or system settings.
 <details>
 <summary><b>Why does it say a hop is fine when it shows a big number?</b></summary>
 
-Long-distance links add latency through plain physics. Netcheck learns each
-hop's normal latency from your history and only calls out rises above that, and
-only when your region is actually degraded.
+Long links add latency because of distance alone. Netcheck learns each hop's
+usual latency from your history and only reports rises above that, and only
+when your region is slow.
 </details>
 
 <details>
 <summary><b>Does it work with a VPN?</b></summary>
 
-Netcheck measures the path your traffic actually takes. With a VPN on, that's
-the path through the VPN, which is useful for comparing the two. Some VPNs drop
-ICMP, and then regions show no reply.
+Netcheck measures the path your traffic takes. With a VPN on, that's the path
+through the VPN. Some VPNs drop ICMP, and then regions show no reply.
 </details>
 
 ## Build from source
@@ -247,7 +233,7 @@ work on the UI on any OS, run `pnpm dev:demo` and open
 
 ## Roadmap
 
-These are plans, not promises. Ideas and pull requests are welcome in
+Planned, in no particular order. Ideas and pull requests are welcome in
 [issues](https://github.com/Mahan-Imanian/netcheck/issues).
 
 - [ ] Signed installers, so SmartScreen stops warning

@@ -31,8 +31,8 @@ sequenceDiagram
     and measure
         Core->>Core: read Windows Firewall rules (read-only)
         Core->>Net: ping router and 1.1.1.1
-        Core->>Net: 20 pings to each region, 16 regions at a time, yours first
-        Core->>Net: traceroute to your region, then 6 pings per hop
+        Core->>Net: 20 pings to each region, 16 regions at a time
+        Core->>Net: traceroute to your region (the fastest, unless you pinned one), then 6 pings per hop
     end
     Core-->>UI: results stream in as each region finishes
     Core->>Core: save the check to history
@@ -49,8 +49,14 @@ tray icon, service, autostart, updater or game watcher.
 four) and uses the first that answers. It then sends 20 echoes (configurable,
 10 to 100) at 100 ms intervals with a 1 s timeout and a 32-byte payload, the
 same as `ping.exe`. Sends don't wait for replies, so a 180 ms RTT doesn't
-stretch the 100 ms interval. Up to 16 regions are measured at once, and your
-preferred region always goes first.
+stretch the 100 ms interval. Up to 16 regions are measured at once. A region
+you pinned in Settings goes first.
+
+**Your region.** By default Netcheck uses the fastest region. It ranks each
+region by average ping plus twice its jitter plus eight times its loss
+percentage, skipping regions your firewall blocks. The gauge follows the
+leader while results arrive, and the route is traced to the winner once every
+region has answered. A region pinned in Settings is traced from the start.
 
 | Stat | Definition |
 |---|---|
@@ -108,7 +114,7 @@ flowchart LR
     INT --> V[Valve relay<br/>last hop]
 ```
 
-Netcheck traces the route to your preferred region. TTL 1 to 15 are probed in
+Netcheck traces the route to your region. TTL 1 to 15 are probed in
 parallel, so 15 hops take about one timeout, not fifteen. Each hop that answers
 then gets 6 echoes.
 
