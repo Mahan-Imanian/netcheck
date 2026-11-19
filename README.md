@@ -41,7 +41,7 @@ before a match starts. It doesn't block servers or change settings.
   where latency or loss jumps.
 - Reads your Windows Firewall rules. Regions you've blocked show as blocked,
   with an estimated ping.
-- Keeps 14 days of history and shows your best and worst hours.
+- Keeps 30 days of checks and shows the last 14 by hour, with your best and worst hours.
 - Launches CS2 through Steam.
 - Tells you when a new version is out, and installs it if you choose Update
   now.

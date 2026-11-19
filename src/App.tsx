@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { useEffect } from "react";
 import { StatusBar } from "./components/StatusBar";
 import { TitleBar } from "./components/TitleBar";
@@ -100,6 +100,7 @@ function Content() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
       >
+        <h1 className="sr-only">Netcheck: {key === "no-relays" ? "relay list unavailable" : key}</h1>
         <Screen />
       </motion.main>
     </AnimatePresence>
@@ -111,6 +112,7 @@ export function App() {
   useTheme();
   useShortcuts();
   return (
+    <MotionConfig reducedMotion="user">
       <div className="relative flex h-full flex-col overflow-hidden bg-bg">
         <div className="vignette" aria-hidden />
         <div className="grain" aria-hidden />
@@ -121,5 +123,6 @@ export function App() {
         </div>
         <UpdateDialog />
       </div>
+    </MotionConfig>
   );
 }

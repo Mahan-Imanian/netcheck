@@ -122,6 +122,7 @@ export function SettingsScreen() {
           <Row label="Your region" hint="The gauge, the route trace and the history follow this region. Automatic picks the fastest one each check.">
             <div className="relative w-[280px]">
               <select
+                aria-label="Your region"
                 value={draft.preferredRegion}
                 onChange={(e) => set({ preferredRegion: e.target.value })}
                 className="well h-8 w-full appearance-none pr-8 pl-3 text-[13px] text-text outline-none focus:border-accent/60"

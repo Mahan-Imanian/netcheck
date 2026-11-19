@@ -156,7 +156,7 @@ export function HistoryScreen() {
                 {l}
               </div>
             ))}
-          <p className="mt-2">History is kept for 30 days on this PC only.</p>
+          <p className="mt-2">The grid shows the last 14 days. Checks are kept for 30 days, on this PC only.</p>
         </section>
       </aside>
     </div>
