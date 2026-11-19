@@ -176,18 +176,29 @@ export function RegionsScreen() {
           </div>
         </div>
         <div className={`grid ${COLS} gap-3 border-y border-line bg-s1 px-4 py-2`}>
-          {HEAD.map((h, i) => (
-            <button
-              key={i}
-              type="button"
-              disabled={!h.key}
-              onClick={() => h.key && setSort(h.key)}
-              className={`eyebrow flex items-center gap-1 ${h.align === "right" ? "justify-end" : ""} ${h.key && sort === h.key ? "text-accent" : ""} enabled:hover:text-text-2`}
-            >
-              {h.label}
-              {h.key && sort === h.key && <ChevronDown size={11} strokeWidth={2.5} />}
-            </button>
-          ))}
+          {HEAD.map((h, i) =>
+            h.key ? (
+              <button
+                key={i}
+                type="button"
+                onClick={() => h.key && setSort(h.key)}
+                aria-pressed={sort === h.key}
+                aria-label={sort === h.key ? `${h.label}, sorted` : `Sort by ${h.label}`}
+                className={`eyebrow flex items-center gap-1 ${h.align === "right" ? "justify-end" : ""} ${sort === h.key ? "text-accent" : ""} hover:text-text-2`}
+              >
+                {h.label}
+                {sort === h.key && <ChevronDown size={11} strokeWidth={2.5} aria-hidden />}
+              </button>
+            ) : (
+              <span
+                key={i}
+                aria-hidden={!h.label || undefined}
+                className={`eyebrow flex items-center ${h.align === "right" ? "justify-end" : ""}`}
+              >
+                {h.label}
+              </span>
+            ),
+          )}
         </div>
         <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto">
           {skeletonRows ? (

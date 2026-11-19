@@ -82,7 +82,7 @@ export function RouteScreen() {
             </span>
           ))}
         </div>
-        <ol className="scrollbar-thin min-h-0 flex-1 overflow-y-auto">
+        <ol className="scrollbar-thin min-h-0 flex-1 overflow-y-auto outline-none focus-visible:ring-1 focus-visible:ring-accent/60" tabIndex={0} aria-label="Hops on the route">
           {route
             ? route.hops.map((h) => {
                 const avg = h.stats?.avg ?? null;
