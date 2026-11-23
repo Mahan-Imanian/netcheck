@@ -7,6 +7,28 @@ versions may change behavior and settings.
 
 ## [Unreleased]
 
+### Added
+
+- Netcheck is now available in Español, Português (Brasil), Français, Deutsch,
+  Русский, Polski, Türkçe, 简体中文, العربية and فارسی, with a right-to-left
+  layout for Arabic and Persian. The setup.exe asks for a language first, with
+  English preselected, and Settings has a Language option.
+- The verdict lists what to do next for each problem it finds.
+- A new verdict for when the internet works but no Valve region answers ping,
+  which usually means a VPN, antivirus or router setting is dropping it.
+
+### Changed
+
+- The map's scanner now drives the results: each region appears when the beam
+  passes over it, and the beam lights up the land it sweeps. The origin is a
+  reticle, and region markers no longer glow.
+- Re-check moved from the title bar to above Launch CS2, once the first check
+  finishes. The title bar lost the status dot and the boxes around its
+  controls.
+- The light theme uses cooler, cleaner neutrals and grade colours with better
+  contrast.
+- Rewrote the verdict and route explanations to be shorter and more specific.
+
 ## [0.3.1] - 2026-11-04
 
 ### Changed

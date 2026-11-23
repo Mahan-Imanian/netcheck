@@ -39,12 +39,19 @@ before a match starts. It doesn't block servers or change settings.
 - Traces the route to that region and groups the hops into router, ISP,
   international link and Valve. If the region is slow, it names the first hop
   where latency or loss jumps.
+- Says what's wrong in plain words and lists what to do about it: offline,
+  slow or lossy Wi-Fi, a congested ISP, a slow international link, a problem
+  on Valve's side, firewall rules that block every region, or a VPN or
+  antivirus that drops ping.
 - Reads your Windows Firewall rules. Regions you've blocked show as blocked,
   with an estimated ping.
 - Keeps 30 days of checks and shows the last 14 by hour, with your best and worst hours.
 - Launches CS2 through Steam.
 - Tells you when a new version is out, and installs it if you choose Update
   now.
+- Speaks English, Español, Português (Brasil), Français, Deutsch, Русский,
+  Polski, Türkçe, 简体中文, العربية and فارسی. Arabic and Persian use a
+  right-to-left layout.
 
 It only runs while its window is open. There's no tray icon, service or
 background updater, and it never needs admin rights.
@@ -57,8 +64,7 @@ background updater, and it never needs admin rights.
 | **History** | **Light theme** |
 | ![The history heatmap of ping by hour](docs/screenshots/history.png) | ![The verdict screen in the light theme](docs/screenshots/light.png) |
 | **Update prompt** | **Settings** |
-| ![The update dialog with the new version and its notes](docs/screenshots/update.png) | ![Settings, including the update check](docs/screenshots/settings.png) |
-
+| ![The update dialog with the new version and its notes](docs/screenshots/update.png) | ![Settings, including the language and update check](docs/screenshots/settings.png) |
 <sub>The animation above is the real app on a live connection. These screenshots come
 from the built-in demo backend, which replays synthetic results and marks every
 screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>
@@ -83,6 +89,9 @@ screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>
    The hash should match the line for that file in `SHA256SUMS.txt` on the
    release page.
 3. Run the installer, then open Netcheck from the Start menu before you play.
+   The setup.exe asks for a language first, with English preselected. The MSI
+   and the portable build start in English. You can change the language in
+   Settings at any time.
 
 Requirements: Windows 11, 64-bit, with Microsoft Edge WebView2 (built into
 Windows 11). Windows 10 should work, because the app and its WebView2 runtime
@@ -127,20 +136,25 @@ doesn't need them either.
 - Some VPNs and firewalls drop ICMP. Regions then show "no reply", even
   though the game itself may connect fine.
 - IPv4 only, like the relay addresses Valve publishes.
+- The translations haven't been reviewed by native speakers yet. If a phrase
+  reads wrong in your language, please
+  [open an issue](https://github.com/Mahan-Imanian/netcheck/issues). City names
+  come from Valve's relay list and stay in English.
 
 ## Using it
 
 1. Open Netcheck. The check starts on its own and takes about 10 seconds.
 2. The big number is your fastest region, or the one you pinned in Settings.
-   The line under the gauge says whether it's good to play, and names a
-   cleaner region if there is one.
+   The verdict under the gauge says whether it's good to play. If something is
+   wrong, it says where and lists the steps to fix it, and names a cleaner
+   region if there is one.
 3. If it's bad, open Route to see which part of the path is slow. A slow
    router or Wi-Fi is on your side. A slow international link is usually your
    ISP at peak hours.
 4. Press Launch CS2.
 
-Press <kbd>R</kbd> to check again. History shows your best and worst hours
-after a few checks.
+Press Re-check above Launch CS2, or <kbd>R</kbd>, to check again. History
+shows your best and worst hours after a few checks.
 
 When a new version is out, Netcheck says so after the first check. Update now
 downloads and installs it, and Later asks again next time you open the app.
@@ -149,6 +163,7 @@ downloads and installs it, and Later asks again next time you open the app.
 
 | Setting | What it does |
 |---|---|
+| Language | One of the 11 languages above. The installer sets it the first time; English is the default. |
 | Your region | Fastest region (the default), or a region you pick. The gauge, route trace and history follow it. |
 | Pings per region | 10 to 100, sent 100 ms apart. More pings give steadier numbers and take longer. |
 | Grade thresholds | Average, jitter and loss limits for each grade. Defaults live in [`config/thresholds.json`](config/thresholds.json). |
@@ -260,7 +275,7 @@ Planned, in no particular order. Ideas and pull requests are welcome in
 - [ ] Tested Windows 10 support
 - [ ] Install with `winget` and Scoop
 - [ ] Other Steam Datagram Relay games that use the same relay list, such as Dota 2 and Deadlock
-- [ ] Translations
+- [x] Translations
 - [x] A portable build that doesn't need installing
 
 ## Contributing

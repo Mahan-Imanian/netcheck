@@ -136,7 +136,9 @@ wolf:
 
 1.1.1.1 is measured as an "is the whole internet slow?" baseline. If 1.1.1.1 is
 bad and most regions are degraded, the verdict blames your ISP, not any one
-region.
+region. If the relay list downloads but no region answers a single ping, the
+verdict says that something on the way, usually a VPN, antivirus or router
+setting, is dropping ICMP.
 
 ## Network use and privacy
 
@@ -189,6 +191,11 @@ release. Because the files aren't code-signed, it doesn't prove who built them.
 | `%TEMP%\netcheck-update\` | The last update installer, only if you chose Update now. |
 
 Deleting the folder resets Netcheck's cache, history and settings.
+
+The setup.exe's language picker saves its choice under
+`HKCU\Software\Mahan Imanian\Netcheck\Installer Language`. Netcheck reads that
+value, never writes it, and stops using it once Settings are saved with a
+language of their own.
 
 ## Architecture
 
@@ -244,7 +251,7 @@ the core can't drift apart. CI fails if they're out of date.
 Add `&update=1` to show the update dialog, `&update=portable` for the
 portable build's version of it, or `&update=fail` to see a failed download.
 
-Add `&theme=light`, `&speed=0.5` or `&tab=regions` (or `map`, `route`,
+Add `&theme=light`, `&lang=fa` (any language code in `src/i18n/`), `&speed=0.5` or `&tab=regions` (or `map`, `route`,
 `history`, `settings`) as needed. Demo data uses only RFC 5737 documentation
 IPs and shows a **DEV DEMO DATA** badge. It's only compiled in for `--mode demo`,
 and CI checks that release bundles don't contain it.

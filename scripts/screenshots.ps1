@@ -15,7 +15,9 @@ $shots = @(
   @("blocked", "scenario=blocked", 1200, 760),
   @("firewalloff", "scenario=firewalloff", 1200, 760),
   @("offline", "scenario=offline", 1200, 760),
-  @("update", "scenario=normal&update=1", 1200, 760)
+  @("update", "scenario=normal&update=1", 1200, 760),
+  @("settings", "scenario=normal&tab=settings", 1200, 760),
+  @("persian", "scenario=unstable&lang=fa", 1200, 760)
 )
 foreach ($s in $shots) {
   $file = Join-Path $out "$($s[0]).png"

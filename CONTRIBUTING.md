@@ -97,6 +97,7 @@ date.
 | `src-tauri/` | The thin Tauri shell: commands, window lifecycle and shutdown. |
 | `src/` | The React and TypeScript UI, with a single Zustand store. |
 | `src/demo/` | The development-only demo backend. |
+| `src/i18n/` | UI text. `en.ts` is the source; every other language file has the same keys and placeholders, and a test checks that. |
 | `config/thresholds.json` | Default grade thresholds. |
 | `scripts/` | Screenshot capture, the world-map generator, Windows verification. |
 | `docs/` | Technical documentation and README images. |
@@ -110,6 +111,8 @@ date.
   regenerates the README images from the demo backend.
 - Add a line under `Unreleased` in [CHANGELOG.md](CHANGELOG.md) for anything
   user-visible.
+- New or changed UI text goes in `src/i18n/en.ts` and in every other language
+  file in that folder. Corrections from native speakers are very welcome.
 
 ## Ground rules
 
