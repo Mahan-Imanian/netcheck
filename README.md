@@ -65,6 +65,8 @@ background updater, and it never needs admin rights.
 | ![The history heatmap of ping by hour](docs/screenshots/history.png) | ![The verdict screen in the light theme](docs/screenshots/light.png) |
 | **Update prompt** | **Settings** |
 | ![The update dialog with the new version and its notes](docs/screenshots/update.png) | ![Settings, including the language and update check](docs/screenshots/settings.png) |
+| **Map scan** | **Persian, right to left** |
+| ![The scanner halfway round, with only the regions it has passed revealed](docs/screenshots/map-sweep.png) | ![The verdict screen in Persian](docs/screenshots/persian.png) |
 <sub>The animation above is the real app on a live connection. These screenshots come
 from the built-in demo backend, which replays synthetic results and marks every
 screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>

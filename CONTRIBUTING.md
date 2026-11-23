@@ -107,8 +107,9 @@ date.
 - Keep each pull request to one change, and say what you verified and how.
 - Add or update tests for behavior changes. Measurement and diagnosis logic
   needs a test with a literal expected value.
-- UI changes need before and after screenshots. `scripts/screenshots.ps1`
-  regenerates the README images from the demo backend.
+- UI changes need before and after screenshots. `node scripts/screenshots.mjs`
+  rebuilds the demo and regenerates the README images with headless Chrome or
+  Edge.
 - Add a line under `Unreleased` in [CHANGELOG.md](CHANGELOG.md) for anything
   user-visible.
 - New or changed UI text goes in `src/i18n/en.ts` and in every other language

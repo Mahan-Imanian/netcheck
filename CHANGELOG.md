@@ -28,6 +28,10 @@ versions may change behavior and settings.
 - The light theme uses cooler, cleaner neutrals and grade colours with better
   contrast.
 - Rewrote the verdict and route explanations to be shorter and more specific.
+- Panel corners have traced, machined edges, and Re-check has a framed button
+  that shows the check's progress.
+- The map scan keeps running when Windows animation effects are off, since it
+  shows the check's progress.
 
 ## [0.3.1] - 2026-11-04
 

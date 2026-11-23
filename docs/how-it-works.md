@@ -255,7 +255,7 @@ Add `&theme=light`, `&lang=fa` (any language code in `src/i18n/`), `&speed=0.5` 
 `history`, `settings`) as needed. Demo data uses only RFC 5737 documentation
 IPs and shows a **DEV DEMO DATA** badge. It's only compiled in for `--mode demo`,
 and CI checks that release bundles don't contain it.
-[`scripts/screenshots.ps1`](../scripts/screenshots.ps1) captures the README
+[`scripts/screenshots.mjs`](../scripts/screenshots.mjs) captures the README
 images from these scenarios.
 
 ## Screens and states

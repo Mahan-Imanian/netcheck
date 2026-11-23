@@ -23,6 +23,12 @@ const SCREENS: Record<Tab, () => React.JSX.Element | null> = {
   settings: SettingsScreen,
 };
 
+// The demo's ?tab= applies before the first render, so screenshots don't catch a screen transition.
+if (import.meta.env.VITE_NETCHECK_DEMO === "1") {
+  const demoTab = new URLSearchParams(window.location.search).get("tab");
+  if (demoTab && demoTab in SCREENS) useApp.setState({ tab: demoTab as Tab });
+}
+
 function useTheme() {
   const theme = useApp((s) => s.settings?.theme ?? "system");
   useEffect(() => {
@@ -57,8 +63,6 @@ function useBoot() {
       const settings = await backend.getSettings();
       useApp.setState({ backend, settings, preferred: settings.preferredRegion });
       window.setTimeout(() => void backend.window.show(), 30);
-      const demoTab = backend.demo ? new URLSearchParams(window.location.search).get("tab") : null;
-      if (demoTab && demoTab in SCREENS) useApp.getState().setTab(demoTab as Tab);
       void useApp.getState().startCheck();
       void useApp.getState().loadHistory();
     })();
