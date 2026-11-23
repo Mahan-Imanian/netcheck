@@ -113,7 +113,7 @@ export function UpdateDialog() {
 
             <div className="mt-4 flex items-end gap-4">
               <span className="display text-[52px] leading-[0.85] font-bold text-text">{update.version}</span>
-              <span className="num pb-1 text-[12px] text-text-3">{t("update.have", { version: update.current })}</span>
+              <span className="tnum pb-1 text-[12px] text-text-3">{t("update.have", { version: update.current })}</span>
             </div>
 
             <Notes markdown={update.notes} />

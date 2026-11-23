@@ -45,7 +45,7 @@ export function StatusBar() {
         <span className={`inline-flex items-center gap-1.5 ${unreachable ? "text-playable" : ""}`} title={relays.liveError ?? refreshError ?? undefined}>
           {unreachable ? <CloudOff size={12} /> : <Database size={12} />}
           {unreachable ? t("sb.relaysDown") : cached ? t("sb.relaysCached") : t("sb.relaysLive")}
-          <span className="num">{cached ? age(relays.fetchedAtMs, now, intlTag(locale), t("sb.justNow")) : t("sb.justNow")}</span>
+          <span className="tnum">{cached ? age(relays.fetchedAtMs, now, intlTag(locale), t("sb.justNow")) : t("sb.justNow")}</span>
         </span>
       ) : (
         <span>{t("sb.relaysNone")}</span>
@@ -69,7 +69,7 @@ export function StatusBar() {
       <Sep />
       <span className="inline-flex items-center gap-1.5 max-[1100px]:hidden" title={t("sb.gateway")}>
         <Router size={12} />
-        <span className="num">{baseline?.gatewayIp ?? t("sb.router")}</span>
+        <span className={baseline?.gatewayIp ? "num" : "tnum"}>{baseline?.gatewayIp ?? t("sb.router")}</span>
         {baseline?.gateway && <span className="num text-text-2">{ms(baseline.gateway.avg)} ms</span>}
       </span>
       <span className="inline-flex items-center gap-1.5" title={t("sb.baseline")}>

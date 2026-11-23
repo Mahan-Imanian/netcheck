@@ -70,21 +70,28 @@ function ReCheckButton() {
       onClick={() => void startCheck()}
       disabled={checking}
       title={t("recheck.title")}
-      className="chamfer-sm group display relative flex h-10 w-full items-center gap-3 bg-s3 ps-4 pe-3 text-[15px] font-bold tracking-[0.12em] text-text uppercase shadow-[inset_0_0_0_1px_var(--nc-line-2)] transition-[background,box-shadow] duration-150 hover:bg-s4 hover:shadow-[inset_0_0_0_1px_var(--nc-line-3)] active:translate-y-px disabled:text-text-3"
+      className="frame group display flex h-11 w-full items-stretch text-[15px] font-bold tracking-[0.12em] text-text uppercase active:translate-y-px disabled:text-text-3"
     >
-      <RotateCw
-        size={14}
-        strokeWidth={2.5}
-        className={`shrink-0 transition-transform duration-300 group-enabled:group-hover:rotate-90 ${checking ? "animate-spin [animation-duration:1.4s]" : ""}`}
-        aria-hidden
-      />
-      <span className="flex-1 text-start">{t("recheck.label")}</span>
-      {checking && total > 0 ? (
-        <span className="num text-[12px] tracking-normal" dir="ltr">
-          {done}/{total}
-        </span>
-      ) : (
-        <kbd className="num grid h-5 min-w-5 place-items-center px-1 text-[10.5px] tracking-normal text-text-3 shadow-[inset_0_0_0_1px_var(--nc-line-2)]">R</kbd>
+      <span className="flex w-11 shrink-0 items-center justify-center border-e border-line-2">
+        <RotateCw
+          size={15}
+          strokeWidth={2.5}
+          className={`transition-transform duration-300 group-enabled:group-hover:rotate-90 ${checking ? "animate-spin [animation-duration:1.4s]" : ""}`}
+          aria-hidden
+        />
+      </span>
+      <span className="flex flex-1 items-center ps-4 text-start">{t("recheck.label")}</span>
+      <span className="flex items-center pe-3.5">
+        {checking && total > 0 ? (
+          <span className="num text-[12px] tracking-normal text-text-2" dir="ltr">
+            {done}/{total}
+          </span>
+        ) : (
+          <kbd className="num grid h-5 min-w-5 place-items-center px-1 text-[10.5px] tracking-normal text-text-3 shadow-[inset_0_0_0_1px_var(--nc-line-2)]">R</kbd>
+        )}
+      </span>
+      {checking && total > 0 && (
+        <span className="absolute inset-x-px bottom-px h-[2px] origin-left bg-text/70 transition-transform duration-300 rtl:origin-right" style={{ transform: `scaleX(${done / total})` }} aria-hidden />
       )}
     </button>
   );
@@ -142,7 +149,7 @@ function Hero() {
           </span>
           <div className="min-w-0">
             {info ? <h1 className="display truncate text-[30px] leading-none font-bold tracking-[0.06em] uppercase">{info.city}</h1> : <Skeleton className="h-[22px] w-28" />}
-            <div className="num mt-1 truncate text-[11.5px] text-text-3">
+            <div className="tnum mt-1 truncate text-[11.5px] text-text-3">
               {auto ? t("hero.fastest") : `${preferred.toUpperCase()} · ${t("hero.pinned")}`}
               {result?.target && <span className="max-[1100px]:hidden"> · {result.target}</span>}
             </div>
@@ -154,7 +161,7 @@ function Hero() {
           {result ? <GradePill tone={tone} size="lg" /> : <Skeleton className="h-8 w-24" />}
         </div>
 
-        <div className="mt-4 grid shrink-0 grid-cols-[auto_1fr] items-center gap-7 [@media(max-height:700px)]:mt-2 [@media(max-height:700px)]:gap-5">
+        <div className="mt-8 grid shrink-0 grid-cols-[auto_1fr] items-center gap-7 [@media(max-height:700px)]:mt-6 [@media(max-height:700px)]:gap-5">
           <div className="h-[clamp(140px,24vh,262px)]" dir="ltr">
             {result ? (
               <Gauge value={s?.avg} color={color} thresholds={thresholds} settled={done} unit={t("gauge.unit")} />
@@ -186,7 +193,9 @@ function Hero() {
           </div>
         </div>
 
-        <div className="well relative mt-5 flex min-h-20 flex-1 flex-col overflow-hidden px-3.5 pt-2.5 pb-2 [@media(max-height:760px)]:hidden">
+        <div
+          className={`well relative mt-5 flex min-h-16 flex-1 flex-col overflow-hidden px-3.5 pt-2.5 pb-2 [@media(max-height:700px)]:mt-3 ${steps.length > 0 && done ? "[@media(max-height:819px)]:hidden" : ""}`}
+        >
           <div className="grid-texture pointer-events-none absolute inset-0 opacity-80" aria-hidden />
           <div className="relative flex justify-between gap-3 text-[12px] text-text-3">
             <span className="hud-label text-text-2">{t("pings.title")}</span>
@@ -230,7 +239,7 @@ function Hero() {
               {verdict?.line ?? t("v.measuring.l", { city: info?.city ?? preferred.toUpperCase() })}
             </p>
             {steps.length > 0 && done && (
-              <ol className="mt-2.5 space-y-1 border-s border-line-2 ps-3 [@media(max-height:760px)]:[&>li:nth-child(n+3)]:hidden" aria-label={t("steps.title")}>
+              <ol className="mt-2.5 space-y-1 border-s border-line-2 ps-3 [@media(max-height:719px)]:[&>li:nth-child(n+3)]:hidden" aria-label={t("steps.title")}>
                 {steps.map((step, i) => (
                   <li key={step} className="flex gap-2.5 text-[12.5px] leading-snug text-pretty text-text-2">
                     <span className="num shrink-0 pt-px text-[11px] text-text-3">{String(i + 1).padStart(2, "0")}</span>
@@ -251,7 +260,7 @@ function Hero() {
               {ms(alt.stats.avg)}
               <span className="text-[10px] font-normal text-text-3"> ms</span>
             </span>
-            <span className="num text-[11px] text-text-3">{t("best.loss", { pct: pct(alt.stats.lossPct) })}</span>
+            <span className="tnum text-[11px] text-text-3">{t("best.loss", { pct: pct(alt.stats.lossPct) })}</span>
             <GradePill tone={resultTone(alt)} />
           </motion.div>
         )}
@@ -261,10 +270,9 @@ function Hero() {
             <CloudOff size={12} className="shrink-0" /> {t("cache.note", { age: age(cacheNote, Date.now(), intlTag(locale), t("sb.justNow")) })}
           </p>
         )}
-        <div className="h-4 shrink-0" />
       </div>
 
-      <div className="relative space-y-2.5 px-7 pb-6 [@media(max-height:700px)]:px-6 [@media(max-height:700px)]:pb-4">
+      <div className="relative space-y-2.5 px-7 pt-5 pb-6 [@media(max-height:700px)]:px-6 [@media(max-height:700px)]:pt-4 [@media(max-height:700px)]:pb-4">
         {showRecheck && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}>
             <ReCheckButton />

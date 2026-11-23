@@ -103,7 +103,7 @@ export function RouteScreen() {
                     style={problem ? { boxShadow: "inset calc(2px * var(--nc-flip)) 0 0 var(--nc-bad)" } : undefined}
                   >
                     <span className="num text-[12px] text-text-3">{String(h.ttl).padStart(2, "0")}</span>
-                    <span className={`num truncate text-[12.5px] ${h.addr ? "text-text" : "text-text-3"}`}>
+                    <span className={`truncate text-[12.5px] ${h.addr ? "num text-text" : "text-text-3"}`}>
                       {h.addr ?? `* * *  ${t("route.noReply")}`}
                       {h.isDestination && <span className="ms-2 font-sans text-[10.5px] text-accent uppercase">{t("route.relay")}</span>}
                     </span>

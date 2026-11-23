@@ -46,7 +46,7 @@ export function HistoryScreen() {
           <h2 className="hud-title">{t("history.title", { city })}</h2>
           <span className="text-[12px] text-text-3">{t("history.sub")}</span>
           <span className="flex-1" />
-          <span className="num text-[11.5px] text-text-3">{t("history.checks", { n: checks })}</span>
+          <span className="tnum text-[11.5px] text-text-3">{t("history.checks", { n: checks })}</span>
         </div>
 
         <div className="mt-4 grid min-h-0 flex-1 grid-cols-[72px_1fr] grid-rows-[1fr_auto] gap-x-2">
@@ -97,7 +97,7 @@ export function HistoryScreen() {
         </div>
         <div className="mt-3 flex h-5 items-center gap-4 text-[11.5px] text-text-3">
           {hover ? (
-            <span className="num text-text-2">
+            <span className="tnum text-text-2">
               {t("history.detail", { day: dayOf(hover.day), hour: hourLabel(hover.hour), ms: ms(hover.avgMs), loss: pct(hover.lossPct), n: hover.samples })}
             </span>
           ) : (

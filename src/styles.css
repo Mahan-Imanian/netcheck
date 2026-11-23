@@ -48,6 +48,8 @@
   --nc-beam: #ece8e1;
   --nc-beam-fill: rgb(236 232 225 / 0.2);
   --nc-hero-wash: 18%;
+  --nc-edge: rgb(236 232 225 / 0.42);
+  --nc-edge-soft: rgb(236 232 225 / 0.18);
 }
 
 :root {
@@ -95,6 +97,8 @@
   --nc-beam: #0f141b;
   --nc-beam-fill: rgb(16 22 30 / 0.12);
   --nc-hero-wash: 9%;
+  --nc-edge: rgb(16 22 30 / 0.5);
+  --nc-edge-soft: rgb(16 22 30 / 0.22);
 }
 
 @theme inline {
@@ -135,8 +139,24 @@
   #root {
     height: 100%;
   }
+  /* Wrap prose without stranded last words, and keep headings evenly split. */
+  p,
+  li,
+  dd,
+  dt,
+  label,
+  blockquote {
+    text-wrap: pretty;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
   body {
     margin: 0;
+    overflow-wrap: break-word;
     background: var(--nc-bg);
     color: var(--nc-text);
     font-family: var(--font-sans);
@@ -165,6 +185,9 @@
     font-variant-numeric: tabular-nums slashed-zero;
     font-feature-settings: "tnum", "zero";
     letter-spacing: -0.02em;
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
   }
   .display {
     font-family: var(--font-display);
@@ -219,18 +242,52 @@
       0 calc(var(--cut) - 0.5px)
     );
   }
+  /* Machined edges: both cut corners are traced, with a short rail running off each cut. */
   .panel::after {
+    --diag: linear-gradient(135deg, transparent calc(50% - 1px), var(--nc-edge) calc(50% - 1px), var(--nc-edge) calc(50% + 0.75px), transparent calc(50% + 0.75px));
     content: "";
     position: absolute;
-    left: 0;
-    top: 0;
-    width: calc(var(--cut) * 1.42);
-    height: 2px;
+    inset: 0;
     z-index: 1;
-    background: var(--nc-line-3);
-    transform-origin: 0 0;
-    transform: translate(0, var(--cut)) rotate(-45deg);
     pointer-events: none;
+    background:
+      var(--diag) 0 0 / var(--cut) var(--cut) no-repeat,
+      var(--diag) 100% 100% / var(--cut) var(--cut) no-repeat,
+      linear-gradient(var(--nc-edge), var(--nc-edge)) var(--cut) 0 / 36px 2px no-repeat,
+      linear-gradient(var(--nc-edge), var(--nc-edge)) 0 var(--cut) / 2px 18px no-repeat,
+      linear-gradient(var(--nc-edge-soft), var(--nc-edge-soft)) right var(--cut) bottom 0 / 36px 2px no-repeat,
+      linear-gradient(var(--nc-edge-soft), var(--nc-edge-soft)) right 0 bottom var(--cut) / 2px 18px no-repeat;
+  }
+  /* A cut-corner button frame with a real 1px border along the cuts. */
+  .frame {
+    --cut: 8px;
+    --frame-line: var(--nc-line-2);
+    --frame-fill: var(--nc-s3);
+    position: relative;
+    isolation: isolate;
+    background: var(--frame-line);
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+    transition: background 150ms var(--ease-out-quint);
+  }
+  .frame::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    background: var(--frame-fill);
+    clip-path: polygon(
+      calc(var(--cut) - 0.5px) 0,
+      100% 0,
+      100% calc(100% - var(--cut) + 0.5px),
+      calc(100% - var(--cut) + 0.5px) 100%,
+      0 100%,
+      0 calc(var(--cut) - 0.5px)
+    );
+    transition: background 150ms var(--ease-out-quint);
+  }
+  .frame:where(:hover:not(:disabled)) {
+    --frame-line: var(--nc-edge);
+    --frame-fill: var(--nc-s4);
   }
   .well {
     background: color-mix(in srgb, var(--nc-bg) 55%, var(--nc-s1));

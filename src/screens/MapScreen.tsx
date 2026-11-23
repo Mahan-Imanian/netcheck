@@ -63,7 +63,7 @@ export function MapScreen() {
               <div className="mt-3" dir="ltr">
                 <Sparkline samples={s.samples} width={238} height={34} color={color} />
               </div>
-              <dl className="num mt-3 grid grid-cols-3 gap-y-2 text-[11.5px]">
+              <dl className="tnum mt-3 grid grid-cols-3 gap-y-2 text-[11.5px]">
                 {[
                   [t("map.min"), ms(s.min)],
                   [t("map.p95"), ms(s.p95)],
