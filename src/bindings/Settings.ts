@@ -10,4 +10,8 @@ closeAfterLaunch: boolean | null, theme: Theme,
 /**
  * Where arcs on the map start. `None` estimates from the lowest-ping region.
  */
-homeLonLat: [number, number] | null, checkUpdates: boolean, };
+homeLonLat: [number, number] | null, checkUpdates: boolean, 
+/**
+ * UI language code. `None` follows the installer's choice, then English.
+ */
+language: string | null, };

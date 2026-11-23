@@ -58,7 +58,7 @@ fn now_ms() -> i64 {
 
 #[tauri::command]
 fn get_settings(state: State<'_, AppState>) -> Result<Settings, AppError> {
-    Ok(state.store.load_settings()?)
+    Ok(state.store.load_settings()?.with_installer_language())
 }
 
 #[tauri::command]

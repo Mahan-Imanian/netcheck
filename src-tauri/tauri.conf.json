@@ -47,7 +47,10 @@
       "webviewInstallMode": { "type": "embedBootstrapper" },
       "nsis": {
         "installMode": "currentUser",
-        "displayLanguageSelector": false
+        "languages": ["English", "Spanish", "PortugueseBR", "French", "German", "Russian", "Polish", "Turkish", "SimpChinese", "Arabic", "Farsi"],
+        "customLanguageFiles": { "Polish": "./nsis/Polish.nsh", "Farsi": "./nsis/Farsi.nsh" },
+        "displayLanguageSelector": true,
+        "installerHooks": "./nsis/hooks.nsh"
       },
       "wix": {
         "language": "en-US"

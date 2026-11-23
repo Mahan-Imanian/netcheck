@@ -240,6 +240,7 @@ export function createDemoBackend(params: URLSearchParams): Backend {
     theme: (params.get("theme") as Settings["theme"] | null) ?? "dark",
     homeLonLat: null,
     checkUpdates: true,
+    language: params.get("lang"),
   };
   let run = 0;
   const updateMode = params.get("update");
