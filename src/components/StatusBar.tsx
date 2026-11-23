@@ -1,5 +1,6 @@
 import { CloudOff, Database, Router, ShieldAlert, Globe2, FlaskConical } from "lucide-react";
 import { useEffect, useState } from "react";
+import { intlTag, useLocale, useT } from "../i18n";
 import { age, ms } from "../lib/format";
 import { useApp } from "../lib/store";
 
@@ -8,18 +9,21 @@ function Sep() {
 }
 
 function Profile({ label, on, active }: { label: string; on: boolean; active: boolean }) {
+  const t = useT();
   return (
     <span
       className={`inline-flex items-center gap-1 ${active ? "text-text-2" : "text-text-3"}`}
-      title={`${label} profile: firewall ${on ? "on" : "off"}${active ? " (current network)" : ""}`}
+      title={`${t(on ? "sb.fwOn" : "sb.fwOff", { profile: label })}${active ? t("sb.fwCurrent") : ""}`}
     >
-      <span className={`size-1.5 ${on ? "bg-good" : "bg-bad"}`} />
+      <span className={`size-1.5 ${on ? "bg-good" : "bg-bad"}`} aria-hidden />
       <span className={active ? "underline decoration-line-2 underline-offset-[3px]" : ""}>{label}</span>
     </span>
   );
 }
 
 export function StatusBar() {
+  const t = useT();
+  const locale = useLocale();
   const relays = useApp((s) => s.relays);
   const refreshError = useApp((s) => s.relayRefreshError);
   const firewall = useApp((s) => s.firewall);
@@ -27,8 +31,8 @@ export function StatusBar() {
   const demo = useApp((s) => s.backend?.demo ?? false);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    const t = window.setInterval(() => setNow(Date.now()), 30_000);
-    return () => window.clearInterval(t);
+    const timer = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const cached = relays?.source === "Cache";
@@ -40,35 +44,35 @@ export function StatusBar() {
       {relays ? (
         <span className={`inline-flex items-center gap-1.5 ${unreachable ? "text-playable" : ""}`} title={relays.liveError ?? refreshError ?? undefined}>
           {unreachable ? <CloudOff size={12} /> : <Database size={12} />}
-          {unreachable ? "Valve API unreachable · cached list from " : cached ? "Relay list from " : "Relay list · live · "}
-          <span className="num">{cached ? age(relays.fetchedAtMs, now) : "just now"}</span>
+          {unreachable ? t("sb.relaysDown") : cached ? t("sb.relaysCached") : t("sb.relaysLive")}
+          <span className="num">{cached ? age(relays.fetchedAtMs, now, intlTag(locale), t("sb.justNow")) : t("sb.justNow")}</span>
         </span>
       ) : (
-        <span>Relay list —</span>
+        <span>{t("sb.relaysNone")}</span>
       )}
       <Sep />
       {p ? (
         <span className="inline-flex items-center gap-2">
-          Firewall
-          <Profile label="Domain" on={p.domain} active={(p.active & 1) !== 0} />
-          <Profile label="Private" on={p.private} active={(p.active & 2) !== 0} />
-          <Profile label="Public" on={p.public} active={(p.active & 4) !== 0} />
+          {t("sb.firewall")}
+          <Profile label={t("fw.domain")} on={p.domain} active={(p.active & 1) !== 0} />
+          <Profile label={t("fw.private")} on={p.private} active={(p.active & 2) !== 0} />
+          <Profile label={t("fw.public")} on={p.public} active={(p.active & 4) !== 0} />
         </span>
       ) : (
-        <span title={firewall?.error ?? undefined}>Firewall {firewall ? "unreadable" : "—"}</span>
+        <span title={firewall?.error ?? undefined}>{firewall ? t("sb.fwUnreadable") : t("sb.fwNone")}</span>
       )}
       {firewall?.warnInactive && (
         <span className="inline-flex items-center gap-1 text-playable">
-          <ShieldAlert size={12} /> Block rule does nothing while the firewall is off
+          <ShieldAlert size={12} /> {t("sb.fwWarn")}
         </span>
       )}
       <Sep />
-      <span className="inline-flex items-center gap-1.5 max-[1100px]:hidden" title="Your default gateway">
+      <span className="inline-flex items-center gap-1.5 max-[1100px]:hidden" title={t("sb.gateway")}>
         <Router size={12} />
-        <span className="num">{baseline?.gatewayIp ?? "router —"}</span>
+        <span className="num">{baseline?.gatewayIp ?? t("sb.router")}</span>
         {baseline?.gateway && <span className="num text-text-2">{ms(baseline.gateway.avg)} ms</span>}
       </span>
-      <span className="inline-flex items-center gap-1.5" title="Baseline: is the whole internet slow?">
+      <span className="inline-flex items-center gap-1.5" title={t("sb.baseline")}>
         <Globe2 size={12} />
         <span className="num">1.1.1.1</span>
         <span className="num text-text-2">{baseline?.internet ? `${ms(baseline.internet.avg)} ms` : "—"}</span>
@@ -76,10 +80,12 @@ export function StatusBar() {
       <span className="flex-1" />
       {demo && (
         <span className="chamfer-sm display inline-flex items-center gap-1 bg-playable/15 px-2 py-px text-[12px] font-bold tracking-[0.08em] text-playable uppercase">
-          <FlaskConical size={11} /> Dev demo data
+          <FlaskConical size={11} /> {t("sb.demo")}
         </span>
       )}
-      <span className="num">v{__APP_VERSION__}</span>
+      <span className="num" dir="ltr">
+        v{__APP_VERSION__}
+      </span>
     </footer>
   );
 }

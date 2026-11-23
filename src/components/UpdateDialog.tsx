@@ -3,6 +3,7 @@ import { ArrowUpRight, Download } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { UpdateInfo } from "../bindings/UpdateInfo";
 import { megabytes, parseNotes } from "../lib/releaseNotes";
+import { useT } from "../i18n";
 import { useApp } from "../lib/store";
 
 type Stage = { kind: "offer" } | { kind: "downloading"; done: number; total: number } | { kind: "installing" } | { kind: "error"; message: string };
@@ -18,8 +19,8 @@ function Notes({ markdown }: { markdown: string }) {
             {b.text}
           </h3>
         ) : b.kind === "item" ? (
-          <p key={i} className="relative mb-1 pl-3.5 text-[12.5px] leading-snug text-text-2">
-            <span className="absolute top-[7px] left-0 size-[5px] bg-text-3" aria-hidden />
+          <p key={i} className="relative mb-1 ps-3.5 text-[12.5px] leading-snug text-text-2">
+            <span className="absolute start-0 top-[7px] size-[5px] bg-text-3" aria-hidden />
             {b.text}
           </p>
         ) : (
@@ -33,6 +34,7 @@ function Notes({ markdown }: { markdown: string }) {
 }
 
 export function UpdateDialog() {
+  const t = useT();
   const backend = useApp((s) => s.backend);
   const checkUpdates = useApp((s) => s.settings?.checkUpdates);
   const settled = useApp((s) => s.phase === "done" || s.phase === "failed");
@@ -103,7 +105,7 @@ export function UpdateDialog() {
           >
             <div className="flex items-center gap-3">
               <h2 id="update-title" className="hud-title">
-                Update available
+                {t("update.title")}
               </h2>
               <span className="h-px flex-1 bg-line" aria-hidden />
               <span className="eyebrow">Netcheck</span>
@@ -111,7 +113,7 @@ export function UpdateDialog() {
 
             <div className="mt-4 flex items-end gap-4">
               <span className="display text-[52px] leading-[0.85] font-bold text-text">{update.version}</span>
-              <span className="num pb-1 text-[12px] text-text-3">You have {update.current}</span>
+              <span className="num pb-1 text-[12px] text-text-3">{t("update.have", { version: update.current })}</span>
             </div>
 
             <Notes markdown={update.notes} />
@@ -123,13 +125,11 @@ export function UpdateDialog() {
                 </div>
                 <p className="mt-2 text-[12px] text-text-2">
                   {stage.kind === "downloading" ? (
-                    <>
-                      Downloading <span className="num">{megabytes(stage.done)}</span> of <span className="num">{megabytes(stage.total)}</span> MB
-                    </>
+                    t("update.downloading", { done: megabytes(stage.done), total: megabytes(stage.total) })
                   ) : msi ? (
-                    "Starting the installer. Netcheck will close while it updates."
+                    t("update.installingMsi")
                   ) : (
-                    "Starting the installer. Netcheck will close and reopen when it's done."
+                    t("update.installing")
                   )}
                 </p>
               </div>
@@ -137,7 +137,7 @@ export function UpdateDialog() {
               <>
                 {stage.kind === "error" && (
                   <p className="mt-4 text-[12px] text-bad" role="alert">
-                    The update didn't finish: {stage.message}. You can download it from GitHub instead.
+                    {t("update.error", { error: stage.message })}
                   </p>
                 )}
                 <div className="mt-5 flex gap-2">
@@ -149,7 +149,7 @@ export function UpdateDialog() {
                       onClick={() => void install()}
                       className="chamfer-sm display inline-flex h-10 flex-1 items-center justify-center gap-2 bg-accent text-[15px] font-bold tracking-[0.1em] text-accent-ink uppercase transition-[filter] duration-150 hover:brightness-110"
                     >
-                      <Download size={15} strokeWidth={2.4} aria-hidden /> Update now
+                      <Download size={15} strokeWidth={2.4} aria-hidden /> {t("update.now")}
                     </motion.button>
                   ) : (
                     <motion.button
@@ -159,7 +159,7 @@ export function UpdateDialog() {
                       onClick={openPage}
                       className="chamfer-sm display inline-flex h-10 flex-1 items-center justify-center gap-2 bg-accent text-[15px] font-bold tracking-[0.1em] text-accent-ink uppercase transition-[filter] duration-150 hover:brightness-110"
                     >
-                      Download <ArrowUpRight size={15} strokeWidth={2.4} aria-hidden />
+                      {t("update.download")} <ArrowUpRight size={15} strokeWidth={2.4} aria-hidden />
                     </motion.button>
                   )}
                   <button
@@ -167,12 +167,12 @@ export function UpdateDialog() {
                     onClick={() => setOpen(false)}
                     className="display h-10 flex-1 border border-line-2 text-[15px] font-semibold tracking-[0.1em] text-text uppercase transition-colors duration-150 hover:bg-s4"
                   >
-                    Later
+                    {t("update.later")}
                   </button>
                 </div>
                 {update.installer && stage.kind !== "error" && (
                   <button type="button" onClick={openPage} className="mt-3 inline-flex items-center gap-1 text-[12px] text-text-3 hover:text-text">
-                    Release page on GitHub <ArrowUpRight size={12} aria-hidden />
+                    {t("update.page")} <ArrowUpRight size={12} aria-hidden />
                   </button>
                 )}
               </>

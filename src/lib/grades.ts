@@ -2,22 +2,23 @@ import type { LucideIcon } from "lucide-react";
 import { ChevronsUp, Check, Minus, X, ShieldBan, CircleOff } from "lucide-react";
 import type { Grade } from "../bindings/Grade";
 import type { RegionResult } from "../bindings/RegionResult";
+import type { MessageKey } from "../i18n";
 
 export type Tone = "excellent" | "good" | "playable" | "bad" | "blocked" | "muted";
 
 export interface ToneMeta {
-  label: string;
+  labelKey: MessageKey;
   icon: LucideIcon;
   color: string;
 }
 
 export const TONES: Record<Tone, ToneMeta> = {
-  excellent: { label: "Excellent", icon: ChevronsUp, color: "var(--nc-excellent)" },
-  good: { label: "Good", icon: Check, color: "var(--nc-good)" },
-  playable: { label: "Playable", icon: Minus, color: "var(--nc-playable)" },
-  bad: { label: "Bad", icon: X, color: "var(--nc-bad)" },
-  blocked: { label: "Blocked", icon: ShieldBan, color: "var(--nc-blocked)" },
-  muted: { label: "No reply", icon: CircleOff, color: "var(--nc-muted)" },
+  excellent: { labelKey: "tone.excellent", icon: ChevronsUp, color: "var(--nc-excellent)" },
+  good: { labelKey: "tone.good", icon: Check, color: "var(--nc-good)" },
+  playable: { labelKey: "tone.playable", icon: Minus, color: "var(--nc-playable)" },
+  bad: { labelKey: "tone.bad", icon: X, color: "var(--nc-bad)" },
+  blocked: { labelKey: "tone.blocked", icon: ShieldBan, color: "var(--nc-blocked)" },
+  muted: { labelKey: "tone.muted", icon: CircleOff, color: "var(--nc-muted)" },
 };
 
 export function gradeTone(g: Grade | null | undefined): Tone {

@@ -5,7 +5,8 @@ import type { Hop } from "../bindings/Hop";
 import type { RouteResult } from "../bindings/RouteResult";
 import type { Segment } from "../bindings/Segment";
 import { ms } from "../lib/format";
-import { SEGMENT_LABEL } from "../lib/routeText";
+import { useT, type T } from "../i18n";
+import { segmentLabel } from "../lib/routeText";
 
 const SEG_ICON: Record<Segment | "You", LucideIcon> = {
   You: Laptop,
@@ -36,10 +37,10 @@ function severity(delta: number | null, problem: boolean): { color: string; widt
 
 const avg = (h: Hop) => h.stats?.avg ?? null;
 
-function compactNodes(route: RouteResult): Node[] {
+function compactNodes(route: RouteResult, t: T): Node[] {
   const problemTtl = route.diagnosis.finding?.ttl;
   const problemSeg = route.diagnosis.finding?.segment;
-  const nodes: Node[] = [{ key: "you", label: "You", sub: "this PC", icon: SEG_ICON.You, avg: 0, loss: 0, problem: false, silent: false, segment: "You" }];
+  const nodes: Node[] = [{ key: "you", label: t("seg.you"), sub: t("seg.thisPc"), icon: SEG_ICON.You, avg: 0, loss: 0, problem: false, silent: false, segment: "You" }];
   for (const seg of ORDER) {
     const hops = route.hops.filter((h) => h.segment === seg);
     const answering = hops.filter((h) => avg(h) != null);
@@ -48,8 +49,8 @@ function compactNodes(route: RouteResult): Node[] {
     const shown = problemHop ?? last;
     nodes.push({
       key: seg,
-      label: SEGMENT_LABEL[seg],
-      sub: hops.length ? `${hops.length} hop${hops.length === 1 ? "" : "s"}` : "—",
+      label: segmentLabel(t, seg),
+      sub: hops.length ? t("seg.hops", { n: hops.length }) : "—",
       icon: SEG_ICON[seg],
       avg: shown ? avg(shown) : null,
       loss: shown?.stats?.lossPct ?? null,
@@ -61,14 +62,14 @@ function compactNodes(route: RouteResult): Node[] {
   return nodes;
 }
 
-function fullNodes(route: RouteResult): Node[] {
+function fullNodes(route: RouteResult, t: T): Node[] {
   const problemTtl = route.diagnosis.finding?.ttl;
   return [
-    { key: "you", label: "You", sub: "this PC", icon: SEG_ICON.You, avg: 0, loss: 0, problem: false, silent: false, segment: "You" },
+    { key: "you", label: t("seg.you"), sub: t("seg.thisPc"), icon: SEG_ICON.You, avg: 0, loss: 0, problem: false, silent: false, segment: "You" },
     ...route.hops.map((h) => ({
       key: `ttl${h.ttl}`,
-      label: h.addr ?? "no reply",
-      sub: `hop ${h.ttl}`,
+      label: h.addr ?? t("seg.noReply"),
+      sub: t("seg.hop", { n: h.ttl }),
       icon: SEG_ICON[h.segment],
       avg: avg(h),
       loss: h.stats?.lossPct ?? null,
@@ -80,6 +81,7 @@ function fullNodes(route: RouteResult): Node[] {
 }
 
 function NodeView({ node, compact, index }: { node: Node; compact: boolean; index: number }) {
+  const t = useT();
   const Icon = node.icon;
   const tone = node.problem ? "var(--nc-bad)" : node.silent ? "var(--nc-text-3)" : node.segment === "You" ? "var(--nc-text)" : "var(--nc-accent)";
   return (
@@ -94,17 +96,14 @@ function NodeView({ node, compact, index }: { node: Node; compact: boolean; inde
         style={{
           borderColor: `color-mix(in srgb, ${tone} 45%, transparent)`,
           background: `color-mix(in srgb, ${tone} 9%, var(--nc-s2))`,
-          boxShadow: node.problem ? "0 0 22px color-mix(in srgb, var(--nc-bad) 55%, transparent)" : undefined,
         }}
       >
-        {node.problem && (
-          <span className="absolute inset-0 border border-bad" style={{ animation: "ring-pulse 1.8s var(--ease-out-quint) infinite" }} />
-        )}
+        {node.problem && <span className="absolute -inset-[3px] border border-bad/60" aria-hidden />}
         <Icon size={compact ? 15 : 17} strokeWidth={1.9} style={{ color: tone }} aria-hidden />
       </div>
-      <div className={`display mt-1.5 leading-none font-bold ${compact ? "text-[17px]" : "text-[19px]"}`} style={{ color: node.problem ? "var(--nc-bad)" : undefined }}>
+      <div dir="ltr" className={`display mt-1.5 leading-none font-bold ${compact ? "text-[17px]" : "text-[19px]"}`} style={{ color: node.problem ? "var(--nc-bad)" : undefined }}>
         {node.silent ? "—" : `${ms(node.avg)}`}
-        {!node.silent && <span className="ml-0.5 text-[11px] font-semibold tracking-[0.06em] text-text-3">MS</span>}
+        {!node.silent && <span className="ms-0.5 text-[11px] font-semibold tracking-[0.06em] text-text-3">MS</span>}
       </div>
       <div className={`mt-1 max-w-full truncate ${compact ? "display text-[12.5px] font-semibold tracking-[0.03em] text-text-3 uppercase" : "num text-[10.5px] text-text-2"}`} title={node.label}>
         {node.label}
@@ -112,7 +111,7 @@ function NodeView({ node, compact, index }: { node: Node; compact: boolean; inde
       {!compact && (
         <div className="text-[10px] text-text-3">
           {node.sub}
-          {node.loss != null && node.loss > 0 && <span className="text-bad"> · {Math.round(node.loss)}% loss</span>}
+          {node.loss != null && node.loss > 0 && <span className="text-bad"> · {t("route.loss", { pct: Math.round(node.loss) })}</span>}
         </div>
       )}
     </motion.div>
@@ -125,12 +124,11 @@ function Link({ from, to, compact }: { from: Node; to: Node; compact: boolean })
   return (
     <div className={`relative flex flex-1 flex-col items-center justify-start ${compact ? "min-w-5 pt-[17px]" : "min-w-3 pt-[21px]"}`}>
       <motion.div
-        className="w-full origin-left"
+        className="w-full origin-left rtl:origin-right"
         style={{
           height: width,
           marginTop: -width / 2,
           background: to.silent || from.silent ? `repeating-linear-gradient(90deg, ${color} 0 3px, transparent 3px 7px)` : color,
-          boxShadow: to.problem ? "0 0 12px var(--nc-bad)" : `0 0 8px -2px ${color}`,
           opacity: to.problem ? 1 : 0.55,
         }}
         initial={{ scaleX: 0 }}
@@ -138,7 +136,7 @@ function Link({ from, to, compact }: { from: Node; to: Node; compact: boolean })
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       />
       {delta != null && Math.abs(delta) >= 1 && !compact && (
-        <span className="num mt-1.5 text-[10px]" style={{ color: to.problem ? "var(--nc-bad)" : "var(--nc-text-3)" }}>
+        <span dir="ltr" className="num mt-1.5 text-[10px]" style={{ color: to.problem ? "var(--nc-bad)" : "var(--nc-text-3)" }}>
           {delta > 0 ? "+" : ""}
           {ms(delta)}
         </span>
@@ -148,7 +146,8 @@ function Link({ from, to, compact }: { from: Node; to: Node; compact: boolean })
 }
 
 export function RouteChain({ route, compact = false }: { route: RouteResult; compact?: boolean }) {
-  const nodes = compact ? compactNodes(route) : fullNodes(route);
+  const t = useT();
+  const nodes = compact ? compactNodes(route, t) : fullNodes(route, t);
   return (
     <div className="flex w-full items-start">
       {nodes.map((n, i) => {

@@ -29,9 +29,10 @@ interface Props {
   thresholds: Thresholds | undefined;
   settled: boolean;
   max?: number;
+  unit: string;
 }
 
-export function Gauge({ value, color, thresholds, settled, max = 200 }: Props) {
+export function Gauge({ value, color, thresholds, settled, max = 200, unit }: Props) {
   const lit = value == null ? 0 : Math.max(1, Math.round((Math.min(value, max) / max) * SEGMENTS));
   const bandColor = (v: number) =>
     !thresholds ? "var(--nc-text-3)" : v <= thresholds.excellent.avgMs ? "var(--nc-excellent)" : v <= thresholds.good.avgMs ? "var(--nc-good)" : v <= thresholds.playable.avgMs ? "var(--nc-playable)" : "var(--nc-bad)";
@@ -81,7 +82,7 @@ export function Gauge({ value, color, thresholds, settled, max = 200 }: Props) {
           >
             {value == null ? "--" : <CountUp value={value} duration={0.7} />}
           </motion.div>
-          <div className="hud-label mt-1.5">ms average</div>
+          <div className="hud-label mt-1.5">{unit}</div>
         </div>
       </div>
     </div>

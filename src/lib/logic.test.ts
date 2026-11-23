@@ -7,6 +7,8 @@ import type { RegionInfo } from "../bindings/RegionInfo";
 import type { RegionResult } from "../bindings/RegionResult";
 import type { RouteResult } from "../bindings/RouteResult";
 import type { Thresholds } from "../bindings/Thresholds";
+import { LOCALES, makeT, MESSAGES } from "../i18n";
+import { en } from "../i18n/en";
 import { playWindows } from "./history";
 import { sortRegions } from "./regions";
 import { megabytes, parseNotes } from "./releaseNotes";
@@ -15,6 +17,8 @@ import { reduce } from "./store";
 import { computeVerdict, type VerdictInput } from "./verdict";
 
 const t = defaults as Thresholds;
+const tr = makeT("en");
+const plain = (s: string | null | undefined) => (s ?? "").replace(/ /g, " ");
 
 function stats(avg: number, opts: { loss?: number; jitter?: number } = {}): PingStats {
   const lost = Math.round(((opts.loss ?? 0) * 20) / 100);
@@ -43,6 +47,8 @@ const infos: Record<string, RegionInfo> = Object.fromEntries(
   ].map(([code, city]) => [code, { code: code!, city: city!, desc: city!, lonLat: [0, 0], relayCount: 1, block: { state: "open" } } satisfies RegionInfo]),
 );
 
+const verdict = (i: VerdictInput) => computeVerdict(i, tr);
+
 const okBaseline: Baseline = { gatewayIp: "192.168.1.1", gateway: stats(1), internetIp: "1.1.1.1", internet: stats(68) };
 
 function input(results: RegionResult[], over: Partial<VerdictInput> = {}): VerdictInput {
@@ -51,41 +57,51 @@ function input(results: RegionResult[], over: Partial<VerdictInput> = {}): Verdi
 
 describe("verdict", () => {
   it("says good to play when the preferred region is clean", () => {
-    const v = computeVerdict(input([region("vie", 82, "Good"), region("fra", 87, "Good")]));
+    const v = verdict(input([region("vie", 82, "Good"), region("fra", 87, "Good")]));
     expect(v.kind).toBe("clean");
-    expect(v.line).toBe("Vienna 82 ms, 0% loss.");
+    expect(plain(v.line)).toBe("Vienna: 82 ms, 0% loss, 1.0 ms jitter.");
+    expect(v.steps).toEqual([]);
   });
 
   it("points to a clean alternative when the preferred region is unstable", () => {
-    const v = computeVerdict(input([region("vie", 82, "Playable", { loss: 5 }), region("fra", 87, "Good")]));
+    const v = verdict(input([region("vie", 82, "Playable", { loss: 5 }), region("fra", 87, "Good")]));
     expect(v.kind).toBe("unstable");
-    expect(v.line).toBe("Vienna is unstable right now. Frankfurt is 5 ms behind and clean.");
+    expect(plain(v.line)).toBe("Vienna is losing 5.0% of packets right now. Frankfurt is clean and only 5 ms slower.");
+    expect(plain(v.steps[0])).toBe("Queue on Frankfurt instead.");
     expect(v.alternative?.code).toBe("fra");
   });
 
   it("blames the ISP when the baseline and most regions are degraded", () => {
     const congested: Baseline = { ...okBaseline, internet: stats(140, { loss: 10 }) };
-    const v = computeVerdict(
+    const v = verdict(
       input([region("vie", 150, "Bad", { loss: 10 }), region("fra", 160, "Bad", { loss: 5 }), region("dxb", 120, "Playable", { loss: 5 })], { baseline: congested }),
     );
     expect(v.kind).toBe("isp");
-    expect(v.line).toContain("congested at your ISP");
+    expect(plain(v.line)).toContain("the problem is your ISP");
+    expect(v.steps).toHaveLength(3);
   });
 
   it("blames Wi-Fi when the router itself is slow", () => {
-    const v = computeVerdict(input([region("vie", 120, "Playable")], { baseline: { ...okBaseline, gateway: stats(38, { loss: 10 }) } }));
+    const v = verdict(input([region("vie", 120, "Playable")], { baseline: { ...okBaseline, gateway: stats(38, { loss: 10 }) } }));
     expect(v.kind).toBe("wifi");
+    expect(plain(v.line)).toBe("Your router answers in 38 ms with 10% loss. A healthy home network is under 5 ms with no loss, and every region feels this.");
   });
 
   it("reports offline and every-region-blocked", () => {
-    expect(computeVerdict(input([], { offline: true })).kind).toBe("offline");
-    const blocked = computeVerdict(input([region("vie", 83, "Good", { blocked: true }), region("fra", 88, "Good", { blocked: true })]));
+    expect(verdict(input([], { offline: true })).kind).toBe("offline");
+    const blocked = verdict(input([region("vie", 83, "Good", { blocked: true }), region("fra", 88, "Good", { blocked: true })]));
     expect(blocked.kind).toBe("allBlocked");
   });
 
   it("marks estimated numbers", () => {
-    const v = computeVerdict(input([region("vie", 83, "Good", { blocked: true }), region("fra", 88, "Good")]));
-    expect(v.line).toContain("(estimated)");
+    const v = verdict(input([region("vie", 83, "Good", { blocked: true }), region("fra", 88, "Good")]));
+    expect(plain(v.line)).toMatch(/Estimated\.$/);
+  });
+
+  it("says ping is being dropped when no region answers but the relay list loaded", () => {
+    const v = verdict(input([region("vie", null, null), region("fra", null, null)], { baseline: { ...okBaseline, internet: null } }));
+    expect(v.kind).toBe("icmpBlocked");
+    expect(plain(v.steps[0])).toBe("Turn off your VPN or proxy, then press Re-check.");
   });
 });
 
@@ -107,11 +123,28 @@ describe("route explanation", () => {
         finding: { segment: "International", ttl: 4, addr: "203.0.113.233", kind: "LatencyAndLoss", prevAvg: 69, avg: 134, lost: 2, sent: 6 },
       },
     };
-    const e = explainRoute(route, { city: "Frankfurt", avg: 87 });
-    expect(e.body).toBe(
-      "Your router and ISP are fine (1 ms, 2 ms). The jump happens at 203.0.113.233, your ISP's international link: 69 → 134 ms with 2/6 lost. This is usually peak-hour congestion and nothing on your PC can fix it.",
+    const e = explainRoute(route, { city: "Frankfurt", avg: 87 }, tr);
+    expect(plain(e.body)).toBe(
+      "Your router and ISP are fine (1 ms, 2 ms). The jump happens at 203.0.113.233, on your ISP's international link: 69 → 134 ms, 2/6 lost. This is usually peak-hour congestion that nothing on your PC can fix.",
     );
-    expect(e.advice).toBe("Try again later, or play on Frankfurt (87 ms, clean).");
+    expect(plain(e.advice)).toBe("Try again after the evening peak, or play on Frankfurt (87 ms, clean).");
+  });
+});
+
+describe("translations", () => {
+  const params = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+
+  it("use the same placeholders as English in every language", () => {
+    for (const { code } of LOCALES) {
+      for (const [key, text] of Object.entries(en)) {
+        expect(params(MESSAGES[code][key as keyof typeof en]), `${code} ${key}`).toEqual(params(text));
+      }
+    }
+  });
+
+  it("fill placeholders and fall back to the key's English text", () => {
+    expect(makeT("en")("v.slow.h", { city: "Vienna" })).toBe("Vienna is slow");
+    expect(makeT("fa")("nav.verdict")).not.toBe("");
   });
 });
 

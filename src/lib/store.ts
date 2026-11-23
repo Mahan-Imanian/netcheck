@@ -44,6 +44,8 @@ interface AppState extends CheckState {
   history: HistoryCell[];
   tab: Tab;
   selected: string | null;
+  /** True once any check this session has ended, so Re-check stays put while the next one runs. */
+  everChecked: boolean;
   setBackend(b: Backend): void;
   setTab(t: Tab): void;
   select(code: string | null): void;
@@ -114,6 +116,7 @@ export const useApp = create<AppState>((set, get) => ({
   history: [],
   tab: "verdict",
   selected: null,
+  everChecked: false,
   setBackend: (backend) => set({ backend }),
   setTab: (tab) => set({ tab }),
   select: (selected) => set({ selected }),
@@ -131,7 +134,10 @@ export const useApp = create<AppState>((set, get) => ({
     } catch (err) {
       if (id === runId) set({ phase: "failed", failure: { message: String(err), offline: false } });
     }
-    if (id === runId) void get().loadHistory();
+    if (id === runId) {
+      set({ everChecked: true });
+      void get().loadHistory();
+    }
   },
 
   saveSettings: async (s) => {

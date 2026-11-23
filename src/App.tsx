@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { StatusBar } from "./components/StatusBar";
 import { TitleBar } from "./components/TitleBar";
 import { UpdateDialog } from "./components/UpdateDialog";
+import { isRtl, useLocale, useT } from "./i18n";
 import { loadBackend } from "./lib/backend";
 import { useApp, type Tab } from "./lib/store";
 import { HistoryScreen } from "./screens/HistoryScreen";
@@ -34,6 +35,17 @@ function useTheme() {
     media.addEventListener("change", apply);
     return () => media.removeEventListener("change", apply);
   }, [theme]);
+}
+
+function useDocumentLocale() {
+  const locale = useLocale();
+  const t = useT();
+  useEffect(() => {
+    const root = document.documentElement;
+    root.lang = locale;
+    root.dir = isRtl(locale) ? "rtl" : "ltr";
+    document.title = t("app.title");
+  }, [locale, t]);
 }
 
 function useBoot() {
@@ -73,6 +85,7 @@ function useShortcuts() {
 }
 
 function Content() {
+  const t = useT();
   const tab = useApp((s) => s.tab);
   const failure = useApp((s) => s.failure);
   const offline = useApp((s) => s.offline);
@@ -100,7 +113,9 @@ function Content() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
       >
-        <h1 className="sr-only">Netcheck: {key === "no-relays" ? "relay list unavailable" : key}</h1>
+        <h1 className="sr-only">
+          Netcheck: {key === "no-relays" ? t("relays.label") : key === "offline" ? t("offline.label") : t(`nav.${tab}`)}
+        </h1>
         <Screen />
       </motion.main>
     </AnimatePresence>
@@ -110,6 +125,7 @@ function Content() {
 export function App() {
   useBoot();
   useTheme();
+  useDocumentLocale();
   useShortcuts();
   return (
     <MotionConfig reducedMotion="user">

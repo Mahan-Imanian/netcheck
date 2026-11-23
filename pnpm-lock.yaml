@@ -14,7 +14,13 @@ importers:
       '@fontsource-variable/geist-mono':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource-variable/vazirmatn':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/barlow-condensed':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/roboto-condensed':
         specifier: ^5.3.0
         version: 5.3.0
       '@tauri-apps/api':
@@ -93,8 +99,14 @@ packages:
   '@fontsource-variable/geist@5.3.0':
     resolution: {integrity: sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA==}
 
+  '@fontsource-variable/vazirmatn@5.3.0':
+    resolution: {integrity: sha512-ZA68W8JHbMdNzzwjYHUWKB2PH22QpxNEnk0ukcXM+XiqYMV6ZWJZAKuNXcrMR2JjuIAwsfAU3KknCXPI6wXUvw==}
+
   '@fontsource/barlow-condensed@5.3.0':
     resolution: {integrity: sha512-RA7MmIx0v3eQ6Gcf74qLVLOwLB0GpPOzx+eU9iG/AmCnSJGcIWYeU8y6CEMGZ210MGwGg5CZhzLkkvyZdTTk1g==}
+
+  '@fontsource/roboto-condensed@5.3.0':
+    resolution: {integrity: sha512-Vbh5pesre/M/Jspd10btdKRqLSTe3yn4l6B2tXHGElCeASfA7Pgdpu1mb8wTG8E72J4Xk6FUfqnSe46UN2QAog==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -931,7 +943,11 @@ snapshots:
 
   '@fontsource-variable/geist@5.3.0': {}
 
+  '@fontsource-variable/vazirmatn@5.3.0': {}
+
   '@fontsource/barlow-condensed@5.3.0': {}
+
+  '@fontsource/roboto-condensed@5.3.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
