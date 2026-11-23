@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useAnimationFrame, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useAnimationFrame } from "motion/react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import land from "../assets/land-dots.json";
 import type { RegionInfo } from "../bindings/RegionInfo";
@@ -225,7 +225,6 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
   const order = useApp((s) => s.order);
   const phase = useApp((s) => s.phase);
   const preferred = useApp((s) => s.preferred);
-  const reduced = useReducedMotion();
   const [hover, setHover] = useState<string | null>(null);
 
   const checking = phase === "relays" || phase === "checking" || phase === "boot";
@@ -253,12 +252,10 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
   useEffect(() => {
     if (Object.keys(results).length === 0 && revealedRef.current.size > 0) setRevealed(new Set());
   }, [results]);
-  useEffect(() => {
-    if (reduced) setRevealed(new Set(Object.keys(results)));
-  }, [reduced, results]);
 
   const waiting = placed.filter((p) => p.result && !revealed.has(p.info.code));
-  const beamOn = !reduced && (checking || waiting.length > 0);
+  // The beam is the check's progress indicator, so it runs even with reduced motion, like a spinner.
+  const beamOn = checking || waiting.length > 0;
 
   const beam = useRef<SVGGElement>(null);
   const beamMask = useRef<SVGGElement>(null);
@@ -474,7 +471,7 @@ export function WorldMap({ compact = false, selected, onSelect }: Props) {
                       <GradePill tone={resultTone(focusResult)} />
                     </span>
                   </div>
-                  <dl className="num mt-2.5 grid grid-cols-3 gap-x-2 text-[11px]">
+                  <dl className="tnum mt-2.5 grid grid-cols-3 gap-x-2 text-[11px]">
                     {(
                       [
                         [t("map.min"), ms(focusResult.stats.min)],
