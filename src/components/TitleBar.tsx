@@ -1,19 +1,22 @@
 import { motion } from "motion/react";
-import { Copy, Minus, RotateCw, Settings2, Square, X } from "lucide-react";
+import { Copy, Minus, Settings2, Square, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { clock } from "../lib/format";
+import { intlTag, useLocale, useT, type MessageKey } from "../i18n";
 import { useApp, type Tab } from "../lib/store";
 import { Logo } from "./Logo";
 
-const TABS: Array<{ id: Tab; label: string }> = [
-  { id: "verdict", label: "Verdict" },
-  { id: "regions", label: "Regions" },
-  { id: "map", label: "Map" },
-  { id: "route", label: "Route" },
-  { id: "history", label: "History" },
+const TABS: Array<{ id: Tab; key: MessageKey }> = [
+  { id: "verdict", key: "nav.verdict" },
+  { id: "regions", key: "nav.regions" },
+  { id: "map", key: "nav.map" },
+  { id: "route", key: "nav.route" },
+  { id: "history", key: "nav.history" },
 ];
 
 function CheckStatus() {
+  const t = useT();
+  const locale = useLocale();
   const phase = useApp((s) => s.phase);
   const total = useApp((s) => s.order.length);
   const done = useApp((s) => s.arrival.length);
@@ -21,23 +24,20 @@ function CheckStatus() {
   const checking = phase === "boot" || phase === "relays" || phase === "checking";
 
   return (
-    <div className="display flex items-center gap-2 text-[13.5px] font-semibold tracking-[0.08em] whitespace-nowrap text-text-2 uppercase" aria-live="polite">
-      <span className={`size-[7px] ${checking ? "live-dot bg-accent" : phase === "failed" ? "bg-bad" : "bg-good"}`} />
+    <div className="display flex items-baseline gap-2 text-[13.5px] font-semibold tracking-[0.08em] whitespace-nowrap text-text-3 uppercase" aria-live="polite">
       {phase === "checking" && total > 0 ? (
-        <span>
-          <span className="text-text">{String(done).padStart(String(total).length, "0")}</span>
-          <span className="text-text-3"> / {total}</span>
-          <span className="max-[1280px]:hidden"> regions</span>
-        </span>
+        <>
+          <span className="max-[1180px]:hidden">{t("status.scanning")}</span>
+          <span className="num tracking-normal" dir="ltr">
+            <span className="text-text">{String(done).padStart(String(total).length, "0")}</span>/{total}
+          </span>
+        </>
       ) : checking ? (
-        <span>Loading relay list</span>
+        <span>{t("status.loading")}</span>
       ) : finishedAt ? (
-        <span>
-          <span className="max-[1280px]:hidden">Checked </span>
-          <span className="text-text">{clock(finishedAt)}</span>
-        </span>
+        <span>{t("status.checked", { time: clock(finishedAt, intlTag(locale)) })}</span>
       ) : (
-        <span>Check stopped</span>
+        <span className="text-bad">{t("status.stopped")}</span>
       )}
     </div>
   );
@@ -58,13 +58,11 @@ function WindowButton({ onClick, label, danger, children }: { onClick: () => voi
 }
 
 export function TitleBar() {
+  const t = useT();
   const tab = useApp((s) => s.tab);
   const setTab = useApp((s) => s.setTab);
   const backend = useApp((s) => s.backend);
-  const startCheck = useApp((s) => s.startCheck);
-  const phase = useApp((s) => s.phase);
   const [maximized, setMaximized] = useState(false);
-  const checking = phase === "relays" || phase === "checking";
 
   useEffect(() => {
     if (!backend) return;
@@ -75,63 +73,57 @@ export function TitleBar() {
     return () => off?.();
   }, [backend]);
 
+  const tabClass = (active: boolean) =>
+    `display relative flex items-center px-3.5 text-[14.5px] font-semibold tracking-[0.1em] uppercase transition-colors duration-150 ${active ? "text-text" : "text-text-3 hover:text-text-2"}`;
+  const bar = <motion.span layoutId="tab-bar" className="absolute inset-x-3.5 -bottom-px h-[2px] bg-accent" transition={{ type: "spring", stiffness: 520, damping: 42 }} />;
+
   return (
-    <header data-tauri-drag-region className="relative z-30 flex h-12 shrink-0 items-stretch border-b border-line pl-4">
-      <div data-tauri-drag-region className="flex items-center gap-2.5 pr-6">
+    <header data-tauri-drag-region className="relative z-30 flex h-12 shrink-0 items-stretch border-b border-line ps-4">
+      <div data-tauri-drag-region className="flex items-center gap-2.5 pe-6">
         <Logo size={22} />
-        <span data-tauri-drag-region className="display text-[19px] leading-none font-bold tracking-[0.14em] uppercase">
+        <span data-tauri-drag-region className="display text-[19px] leading-none font-bold tracking-[0.14em] uppercase" dir="ltr">
           Netcheck
         </span>
       </div>
 
-      <nav className="flex items-stretch border-l border-line pl-2" aria-label="Screens">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            aria-current={tab === t.id ? "page" : undefined}
-            className={`display relative px-3.5 text-[14.5px] font-semibold tracking-[0.1em] uppercase transition-colors duration-150 ${tab === t.id ? "text-text" : "text-text-3 hover:text-text-2"}`}
-          >
-            {t.label}
-            {tab === t.id && (
-              <motion.span layoutId="tab-bar" className="absolute inset-x-3.5 -bottom-px h-[2px] bg-accent" transition={{ type: "spring", stiffness: 520, damping: 42 }} />
-            )}
+      <nav className="flex items-stretch border-s border-line ps-2" aria-label={t("nav.screens")}>
+        {TABS.map((x) => (
+          <button key={x.id} type="button" onClick={() => setTab(x.id)} aria-current={tab === x.id ? "page" : undefined} className={tabClass(tab === x.id)}>
+            {t(x.key)}
+            {tab === x.id && bar}
           </button>
         ))}
       </nav>
 
       <div data-tauri-drag-region className="flex-1" />
 
-      <div data-tauri-drag-region className="flex h-full items-center justify-end">
-        <div className="flex items-center gap-2.5 pr-2">
+      <div data-tauri-drag-region className="flex items-stretch gap-1 pe-1">
+        <div data-tauri-drag-region className="flex items-center pe-3">
           <CheckStatus />
-          <button type="button" onClick={() => void startCheck()} disabled={checking} title="Re-check (R)" className="btn-ghost group whitespace-nowrap">
-            <RotateCw size={13} strokeWidth={2.5} className={`transition-transform duration-300 group-hover:rotate-90 ${checking ? "animate-spin [animation-duration:1.4s]" : ""}`} aria-hidden />
-            <span className="max-[1100px]:hidden">Re-check</span>
-            <kbd className="num px-1 text-[10px] text-text-3 shadow-[inset_0_0_0_1px_var(--nc-line-2)]">R</kbd>
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("settings")}
-            aria-label="Settings"
-            aria-current={tab === "settings" ? "page" : undefined}
-            title="Settings"
-            className={`grid size-[30px] place-items-center shadow-[inset_0_0_0_1px_var(--nc-line-2)] transition-colors duration-150 hover:bg-s4 ${tab === "settings" ? "bg-s4 text-text" : "bg-s3 text-text-2"}`}
-          >
-            <Settings2 size={15} strokeWidth={2} />
-          </button>
-        </div>        <div className="flex h-full items-stretch">
-        <WindowButton label="Minimize" onClick={() => void backend?.window.minimize()}>
+        </div>
+        <button
+          type="button"
+          onClick={() => setTab("settings")}
+          aria-label={t("nav.settings")}
+          aria-current={tab === "settings" ? "page" : undefined}
+          title={t("nav.settings")}
+          className={`${tabClass(tab === "settings")} !px-3`}
+        >
+          <Settings2 size={16} strokeWidth={2} aria-hidden />
+          {tab === "settings" && <motion.span layoutId="tab-bar" className="absolute inset-x-2 -bottom-px h-[2px] bg-accent" transition={{ type: "spring", stiffness: 520, damping: 42 }} />}
+        </button>
+      </div>
+
+      <div className="flex h-full items-stretch border-s border-line" dir="ltr">
+        <WindowButton label={t("window.minimize")} onClick={() => void backend?.window.minimize()}>
           <Minus size={15} strokeWidth={1.5} />
         </WindowButton>
-        <WindowButton label={maximized ? "Restore" : "Maximize"} onClick={() => void backend?.window.toggleMaximize()}>
+        <WindowButton label={maximized ? t("window.restore") : t("window.maximize")} onClick={() => void backend?.window.toggleMaximize()}>
           {maximized ? <Copy size={12} strokeWidth={1.5} className="-scale-x-100" /> : <Square size={11.5} strokeWidth={1.5} />}
         </WindowButton>
-        <WindowButton label="Close" danger onClick={() => void backend?.window.close()}>
+        <WindowButton label={t("window.close")} danger onClick={() => void backend?.window.close()}>
           <X size={16} strokeWidth={1.5} />
         </WindowButton>
-        </div>
       </div>
     </header>
   );

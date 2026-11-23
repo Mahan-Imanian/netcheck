@@ -4,6 +4,10 @@
 @import "@fontsource/barlow-condensed/500.css";
 @import "@fontsource/barlow-condensed/600.css";
 @import "@fontsource/barlow-condensed/700.css";
+@import "@fontsource/roboto-condensed/cyrillic-500.css";
+@import "@fontsource/roboto-condensed/cyrillic-600.css";
+@import "@fontsource/roboto-condensed/cyrillic-700.css";
+@import "@fontsource-variable/vazirmatn";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
@@ -23,7 +27,7 @@
   --nc-hi: rgb(255 255 255 / 0.035);
   --nc-text: #ece8e1;
   --nc-text-2: #a2a5a9;
-  --nc-text-3: #686d74;
+  --nc-text-3: #7d828a;
   --nc-accent: #ece8e1;
   --nc-accent-2: #d3cec5;
   --nc-accent-3: #b9b3a9;
@@ -40,40 +44,57 @@
   --nc-wash-1: rgb(236 232 225 / 0.025);
   --nc-wash-2: rgb(236 232 225 / 0.015);
   --nc-shadow: 0 1px 0 rgb(0 0 0 / 0.4);
+  --nc-land-lit: rgb(236 232 225 / 0.5);
+  --nc-beam: #ece8e1;
+  --nc-beam-fill: rgb(236 232 225 / 0.2);
+  --nc-hero-wash: 18%;
+}
+
+:root {
+  --nc-end: right;
+  --nc-flip: 1;
+}
+[dir="rtl"] {
+  --nc-end: left;
+  --nc-flip: -1;
 }
 
 [data-theme="light"] {
   color-scheme: light;
-  --nc-bg: #e9e6e0;
-  --nc-s1: #f2f0eb;
-  --nc-s2: #fbfaf7;
-  --nc-s3: #eeebe5;
-  --nc-s4: #e2ded6;
-  --nc-glass: #fbfaf7;
+  --nc-bg: #e3e6ea;
+  --nc-s1: #edf0f3;
+  --nc-s2: #f8f9fb;
+  --nc-s3: #e8ebef;
+  --nc-s4: #dce1e6;
+  --nc-glass: #f8f9fb;
   --nc-glass-2: #ffffff;
-  --nc-line: rgb(14 17 21 / 0.08);
-  --nc-line-2: rgb(14 17 21 / 0.15);
-  --nc-line-3: rgb(14 17 21 / 0.3);
+  --nc-line: rgb(16 22 30 / 0.09);
+  --nc-line-2: rgb(16 22 30 / 0.16);
+  --nc-line-3: rgb(16 22 30 / 0.34);
   --nc-hi: rgb(255 255 255 / 0.9);
-  --nc-text: #0e1115;
-  --nc-text-2: #4a4f56;
-  --nc-text-3: #80858c;
-  --nc-accent: #0e1115;
-  --nc-accent-2: #2a2f36;
-  --nc-accent-3: #444a52;
-  --nc-accent-ink: #f2f0eb;
-  --nc-excellent: #0a9a72;
-  --nc-good: #4d8912;
-  --nc-playable: #ac6a00;
-  --nc-bad: #d5283b;
-  --nc-blocked: #5d4bd1;
-  --nc-muted: #8a8f96;
-  --nc-glow: 0.08;
-  --nc-land: rgb(14 17 21 / 0.14);
-  --nc-grid: rgb(14 17 21 / 0.04);
-  --nc-wash-1: rgb(14 17 21 / 0.02);
-  --nc-wash-2: rgb(14 17 21 / 0.015);
-  --nc-shadow: 0 1px 0 rgb(14 17 21 / 0.06);
+  --nc-text: #0f141b;
+  --nc-text-2: #444d59;
+  --nc-text-3: #59626e;
+  --nc-accent: #0f141b;
+  --nc-accent-2: #252c36;
+  --nc-accent-3: #3a434f;
+  --nc-accent-ink: #f8f9fb;
+  --nc-excellent: #00754f;
+  --nc-good: #387512;
+  --nc-playable: #a05600;
+  --nc-bad: #c4182f;
+  --nc-blocked: #5639cc;
+  --nc-muted: #78808b;
+  --nc-glow: 0;
+  --nc-land: rgb(16 22 30 / 0.17);
+  --nc-grid: rgb(16 22 30 / 0.035);
+  --nc-wash-1: rgb(16 22 30 / 0.02);
+  --nc-wash-2: rgb(16 22 30 / 0.015);
+  --nc-shadow: 0 1px 0 rgb(16 22 30 / 0.06);
+  --nc-land-lit: rgb(16 22 30 / 0.55);
+  --nc-beam: #0f141b;
+  --nc-beam-fill: rgb(16 22 30 / 0.12);
+  --nc-hero-wash: 9%;
 }
 
 @theme inline {
@@ -98,9 +119,9 @@
   --color-bad: var(--nc-bad);
   --color-blocked: var(--nc-blocked);
   --color-muted: var(--nc-muted);
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist Variable", "Vazirmatn Variable", "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, monospace;
-  --font-display: "Barlow Condensed", "Geist Variable", sans-serif;
+  --font-display: "Barlow Condensed", "Roboto Condensed", "Vazirmatn Variable", "Microsoft YaHei UI", "Geist Variable", sans-serif;
   --radius-xs: 2px;
   --radius-sm: 2px;
   --radius-md: 3px;
@@ -289,7 +310,40 @@
   background: radial-gradient(120% 90% at 50% 0%, transparent 55%, rgb(0 0 0 / 0.35));
 }
 [data-theme="light"] .vignette {
-  background: radial-gradient(120% 90% at 50% 0%, transparent 60%, rgb(14 17 21 / 0.06));
+  background: radial-gradient(120% 90% at 50% 0%, transparent 60%, rgb(16 22 30 / 0.05));
+}
+[data-theme="light"] .grain {
+  opacity: 0.02;
+}
+
+/* Arabic script is cursive: tracking breaks the joins, and it has no capitals. */
+[dir="rtl"] body,
+[dir="rtl"] body * {
+  letter-spacing: 0 !important;
+}
+[dir="rtl"] .hud-title,
+[dir="rtl"] .hud-label,
+[dir="rtl"] .eyebrow,
+[dir="rtl"] .display {
+  font-family: "Vazirmatn Variable", var(--font-sans);
+}
+[dir="rtl"] .hud-title {
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+[dir="rtl"] .hud-label,
+[dir="rtl"] .eyebrow {
+  font-size: 12px;
+  line-height: 1.4;
+}
+[dir="rtl"] [dir="ltr"] .display {
+  font-family: var(--font-display);
+}
+:lang(zh-CN) .hud-title,
+:lang(zh-CN) .hud-label,
+:lang(zh-CN) .eyebrow {
+  letter-spacing: 0.04em;
 }
 
 @keyframes shimmer {
