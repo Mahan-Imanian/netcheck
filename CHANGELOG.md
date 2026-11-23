@@ -7,6 +7,8 @@ versions may change behavior and settings.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-23
+
 ### Added
 
 - Netcheck is now available in Español, Português (Brasil), Français, Deutsch,
@@ -117,7 +119,8 @@ The first public release.
 - Netcheck never needs administrator rights, never changes system settings, and
   never reads or touches game files.
 
-[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/Mahan-Imanian/netcheck/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.4.0
 [0.3.1]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.3.1
 [0.3.0]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.3.0
 [0.2.1]: https://github.com/Mahan-Imanian/netcheck/releases/tag/v0.2.1
