@@ -256,7 +256,8 @@ Add `&theme=light`, `&lang=fa` (any language code in `src/i18n/`), `&speed=0.5` 
 IPs and shows a **DEV DEMO DATA** badge. It's only compiled in for `--mode demo`,
 and CI checks that release bundles don't contain it.
 [`scripts/screenshots.mjs`](../scripts/screenshots.mjs) captures the README
-images from these scenarios.
+images from these scenarios, and [`scripts/demo-gif.mjs`](../scripts/demo-gif.mjs)
+records the README animation.
 
 ## Screens and states
 

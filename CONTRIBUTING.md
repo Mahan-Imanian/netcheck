@@ -109,7 +109,8 @@ date.
   needs a test with a literal expected value.
 - UI changes need before and after screenshots. `node scripts/screenshots.mjs`
   rebuilds the demo and regenerates the README images with headless Chrome or
-  Edge.
+  Edge, and `node scripts/demo-gif.mjs` re-records the README animation (it needs
+  ffmpeg).
 - Add a line under `Unreleased` in [CHANGELOG.md](CHANGELOG.md) for anything
   user-visible.
 - New or changed UI text goes in `src/i18n/en.ts` and in every other language

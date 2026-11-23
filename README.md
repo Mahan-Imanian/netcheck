@@ -19,7 +19,7 @@ fastest one. Run it before you queue.
 [Contributing](CONTRIBUTING.md) ·
 [Changelog](CHANGELOG.md)
 
-<img src="docs/assets/demo.gif" alt="Netcheck running a check: the gauge fills, regions appear on the map, and the result shows" width="900">
+<img src="docs/assets/demo.gif" alt="Netcheck running a check: the scanner sweeps the map and reveals each region as it passes, then the verdict lists what to do" width="900">
 
 </div>
 
@@ -67,9 +67,9 @@ background updater, and it never needs admin rights.
 | ![The update dialog with the new version and its notes](docs/screenshots/update.png) | ![Settings, including the language and update check](docs/screenshots/settings.png) |
 | **Map scan** | **Persian, right to left** |
 | ![The scanner halfway round, with only the regions it has passed revealed](docs/screenshots/map-sweep.png) | ![The verdict screen in Persian](docs/screenshots/persian.png) |
-<sub>The animation above is the real app on a live connection. These screenshots come
-from the built-in demo backend, which replays synthetic results and marks every
-screen <b>DEV DEMO DATA</b>. Real IPs never appear in them.</sub>
+<sub>The animation above and these screenshots come from the built-in demo backend,
+which replays synthetic results and marks every screen <b>DEV DEMO DATA</b>. Real IPs
+never appear in them.</sub>
 
 ## Install
 
